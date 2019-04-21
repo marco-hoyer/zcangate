@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+	"strconv"
+	"strings"
 )
 
 //@staticmethod
@@ -26,21 +28,35 @@ import (
 //except Exception as e:
 //print("Could not parse can frame '{}', error was: {}".format(frame, e))
 
-func transformFloat(s string) string {
-	return s
-}
-
-func transformTemperature(s string) string {
-	return s
-}
-
-func transformAirVolume(s string) string {
-	return s
-}
-
 type Type struct {
 	name, unit     string
-	transformation func(string) string
+	transformation func(string) float64
+}
+
+type Measurement struct {
+	name, unit string
+	value      float64
+}
+
+func transformSmallNumber(s string) float64 {
+	v, _ := strconv.ParseInt(s[0:2], 16, 64)
+	return float64(v)
+}
+
+func transformFloat(s string) float64 {
+	return 1.02
+}
+
+func transformTemperature(s string) float64 {
+	v1, _ := strconv.ParseInt(s[0:2], 16, 64)
+	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
+	return float64((v1 - v2) / 10)
+}
+
+func transformAirVolume(s string) float64 {
+	v1, _ := strconv.ParseInt(s[0:2], 16, 64)
+	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
+	return float64(v1 + v2*255)
 }
 
 var mapping = map[string]Type{
@@ -82,12 +98,12 @@ var mapping = map[string]Type{
 	"00488041": {
 		name:           "air_humidity_outlet_before_recuperator",
 		unit:           "%",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 	"0048C041": {
 		name:           "air_humidity_inlet_before_recuperator",
 		unit:           "%",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 	"00200041": {
 		name:           "total_power_consumption",
@@ -97,12 +113,12 @@ var mapping = map[string]Type{
 	"001D4041": {
 		name:           "power_percent_output_ventilator",
 		unit:           "%",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 	"001D8041": {
 		name:           "power_percent_input_ventilator",
 		unit:           "%",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 	"0082C042": {
 		name:           "0082C042",
@@ -187,7 +203,7 @@ var mapping = map[string]Type{
 	"00390041": {
 		name:           "frost_disbalance",
 		unit:           "%",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 
 	"0035C041": {
@@ -325,7 +341,7 @@ var mapping = map[string]Type{
 	"ventilation_level": {
 		name:           "00104041",
 		unit:           "ventilation_level",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 
 	"00544041": {
@@ -387,22 +403,36 @@ var mapping = map[string]Type{
 	"00108041": {
 		name:           "bypass_state",
 		unit:           "0=auto,1=open,2=close",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 	"0038C041": {
 		name:           "bypass_open",
 		unit:           "%",
-		transformation: transformFloat,
+		transformation: transformSmallNumber,
 	},
 }
 
-func toType(value string) Type {
-	prefix := string(value[0])
-	address := value[1:9]
-	length := string(value[9])
-	data := string(value[10:])
-	//
-	log.Printf("PARSED: %s | %s | %s | %s\r", prefix, address, length, data)
+func toMeasurement(value string) Measurement {
+	if len(value) < 11 {
+		log.Println("found broken message", value)
+		return Measurement{}
+	} else {
+		prefix := string(value[0])
+		address := value[1:9]
+		length := string(value[9])
+		data := strings.Trim(string(value[10:]), "\r")
 
-	return Type{}
+		dataType, found := mapping[address]
+		if found {
+			//log.Printf("Mapping found for: %s | %s | %s | %s | %s\r", prefix, address, length, data, dataType.name)
+			return Measurement{
+				name:  dataType.name,
+				unit:  dataType.unit,
+				value: dataType.transformation(data),
+			}
+		} else {
+			log.Printf("No mapping for: %s | %s | %s | %s\r", prefix, address, length, data)
+			return Measurement{}
+		}
+	}
 }
