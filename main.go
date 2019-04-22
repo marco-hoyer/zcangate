@@ -18,7 +18,7 @@ func process(in <-chan CanBusFrame) <-chan Measurement {
 	go func() {
 		for b := range in {
 
-			//log.Println(b)
+			log.Println(b)
 			out <- toMeasurement(b)
 		}
 	}()
@@ -53,9 +53,11 @@ func main() {
 	defer close(done)
 
 	//s.Write([]byte("T1F011051485150801\r"))
+	w := CanBusWriter{serial: s}
+	w.write("1F07506A", "8415010100000000003C000001000000")
 
-	lines := readSerial(s)
-	messages := process(lines)
-	logLines(messages)
-	time.Sleep(60 * time.Second)
+	//lines := readSerial(s)
+	//messages := process(lines)
+	//logLines(messages)
+	time.Sleep(1 * time.Second)
 }
