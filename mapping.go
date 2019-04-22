@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"strconv"
-	"strings"
 )
 
 //@staticmethod
@@ -59,380 +58,418 @@ func transformAirVolume(s string) float64 {
 	return float64(v1 + v2*255)
 }
 
-var mapping = map[string]Type{
-	"00148041": {
-		name:           "unknown_decreasing_number",
-		unit:           "unknown",
-		transformation: transformFloat,
+func transformAny(s string) float64 {
+	word := uint8(0)
+	for n := range s {
+		word += s[n] << uint(n*8)
+	}
+	return float64(word)
+}
+
+var mapping = map[int]Type{
+	16: {
+		name:           "z_unknown_NwoNode",
+		unit:           "",
+		transformation: transformAny,
 	},
-	"00454041": {
-		name:           "temperature_inlet_before_recuperator",
-		unit:           "°C",
-		transformation: transformTemperature,
+	17: {
+		name:           "z_unknown_NwoNode",
+		unit:           "",
+		transformation: transformAny,
 	},
-	"00458041": {
-		name:           "temperature_inlet_after_recuperator",
-		unit:           "°C",
-		transformation: transformTemperature,
+	18: {
+		name:           "z_unknown_NwoNode",
+		unit:           "",
+		transformation: transformAny,
 	},
-	"001E0041": {
-		name:           "air_volume_input_ventilator",
-		unit:           "m3",
-		transformation: transformAirVolume,
-	},
-	"001DC041": {
-		name:           "air_volume_output_ventilator",
-		unit:           "m3",
-		transformation: transformAirVolume,
-	},
-	"001E8041": {
-		name:           "speed_input_ventilator",
-		unit:           "rpm",
-		transformation: transformAirVolume,
-	},
-	"001E4041": {
-		name:           "speed_output_ventilator",
-		unit:           "rpm",
-		transformation: transformAirVolume,
-	},
-	"00488041": {
-		name:           "air_humidity_outlet_before_recuperator",
-		unit:           "%",
+	65: {
+		name:           "ventilation_level",
+		unit:           "level",
 		transformation: transformSmallNumber,
 	},
-	"0048C041": {
-		name:           "air_humidity_inlet_before_recuperator",
-		unit:           "%",
-		transformation: transformSmallNumber,
-	},
-	"00200041": {
-		name:           "total_power_consumption",
-		unit:           "W",
-		transformation: transformFloat,
-	},
-	"001D4041": {
-		name:           "power_percent_output_ventilator",
-		unit:           "%",
-		transformation: transformSmallNumber,
-	},
-	"001D8041": {
-		name:           "power_percent_input_ventilator",
-		unit:           "%",
-		transformation: transformSmallNumber,
-	},
-	"0082C042": {
-		name:           "0082C042",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"004C4041": {
-		name:           "004C4041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00384041": {
-		name:           "00384041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-	"00144041": {
-		name:           "remaining_s_in_currend_ventilation_mode",
-		unit:           "s",
-		transformation: transformAirVolume,
-	},
-	"00824042": {
-		name:           "00824042",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00810042": {
-		name:           "00810042",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00208041": {
-		name:           "total_power_consumption",
-		unit:           "kWh",
-		transformation: transformAirVolume,
-	},
-	"00344041": {
-		name:           "00344041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00370041": {
-		name:           "00370041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00300041": {
-		name:           "days_until_next_filter_change",
-		unit:           "days",
-		transformation: transformAirVolume,
-	},
-	"00044041": {
-		name:           "00044041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-	"00204041": {
-		name:           "total_power_consumption_this_year",
-		unit:           "kWh",
-		transformation: transformAirVolume,
-	},
-	"00084041": {
-		name:           "00084041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-	"00804042": {
-		name:           "00804042",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00644041": {
-		name:           "00644041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-	"00354041": {
-		name:           "00354041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00390041": {
-		name:           "frost_disbalance",
-		unit:           "%",
-		transformation: transformSmallNumber,
-	},
-
-	"0035C041": {
-		name:           "total_power_savings",
-		unit:           "kWh",
-		transformation: transformAirVolume,
-	},
-
-	"0044C041": {
-		name:           "0044C041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-
-	"0080C042": {
-		name:           "0080C042",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-
-	"000E0041": {
-		name:           "000E0041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00604041": {
-		name:           "00604041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00450041": {
-		name:           "00450041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-
-	"00378041": {
-		name:           "00378041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00818042": {
-		name:           "00818042",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00820042": {
-		name:           "00820042",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"001D0041": {
-		name:           "001D0041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00490041": {
-		name:           "00490041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00350041": {
-		name:           "00350041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-
-	"0081C042": {
-		name:           "0081C042",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00448041": {
-		name:           "00448041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00560041": {
-		name:           "00560041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00374041": {
-		name:           "00374041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-
-	"00808042": {
-		name:           "00808042",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00040041": {
-		name:           "00040041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"10040001": {
-		name:           "10040001",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00120041": {
-		name:           "00120041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00688041": {
-		name:           "00688041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00358041": {
-		name:           "total_power_savings_this_year",
-		unit:           "kWh",
-		transformation: transformAirVolume,
-	},
-
-	"ventilation_level": {
-		name:           "00104041",
-		unit:           "ventilation_level",
-		transformation: transformSmallNumber,
-	},
-
-	"00544041": {
-		name:           "00544041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00498041": {
-		name:           "00498041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00814042": {
-		name:           "00814042",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"000C4041": {
-		name:           "000C4041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00828042": {
-		name:           "00828042",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"00494041": {
-		name:           "00494041",
-		unit:           "unknown",
-		transformation: transformFloat,
-	},
-
-	"004C8041": {
-		name:           "004C8041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00388041": {
-		name:           "00388041",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00188041": {
-		name:           "bypass_a_status",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00184041": {
-		name:           "bypass_b_status",
-		unit:           "unknown",
-		transformation: transformAirVolume,
-	},
-	"00108041": {
+	66: {
 		name:           "bypass_state",
 		unit:           "0=auto,1=open,2=close",
 		transformation: transformSmallNumber,
 	},
-	"0038C041": {
+	81: {
+		name:           "Timer1",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	82: {
+		name:           "Timer2",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	83: {
+		name:           "Timer3",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	84: {
+		name:           "Timer4",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	85: {
+		name:           "Timer5",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	86: {
+		name:           "Timer6",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	87: {
+		name:           "Timer7",
+		unit:           "s",
+		transformation: transformAny,
+	},
+	88: {
+		name:           "Timer8",
+		unit:           "s",
+		transformation: transformAny,
+	},
+
+	96: {
+		name:           "bypass ??? ValveMsg",
+		unit:           "unknown",
+		transformation: transformAny,
+	},
+	97: {
+		name:           "bypass_b_status",
+		unit:           "unknown",
+		transformation: transformAirVolume,
+	},
+	98: {
+		name:           "bypass_a_status",
+		unit:           "unknown",
+		transformation: transformAirVolume,
+	},
+
+	115: {
+		name:           "ventilator enabled output",
+		unit:           "",
+		transformation: transformAny,
+	},
+	116: {
+		name:           "ventilator enabled input",
+		unit:           "",
+		transformation: transformAny,
+	},
+	117: {
+		name:           "ventilator power_percent output",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	118: {
+		name:           "ventilator power_percent input",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	119: {
+		name:           "ventilator air_volume output",
+		unit:           "m3",
+		transformation: transformAirVolume,
+	},
+	120: {
+		name:           "ventilator air_volume input",
+		unit:           "m3",
+		transformation: transformAirVolume,
+	},
+	121: {
+		name:           "ventilator speed output",
+		unit:           "rpm",
+		transformation: transformAirVolume,
+	},
+	122: {
+		name:           "ventilator speed input",
+		unit:           "rpm",
+		transformation: transformAirVolume,
+	},
+	128: {
+		name:           "Power_consumption_actual",
+		unit:           "W",
+		transformation: transformSmallNumber,
+	},
+	129: {
+		name:           "Power_consumption_this_year",
+		unit:           "kWh",
+		transformation: transformAirVolume,
+	},
+	130: {
+		name:           "Power_consumption_lifetime",
+		unit:           "kWh",
+		transformation: transformAirVolume,
+	},
+	144: {
+		name:           "Power PreHeater this year",
+		unit:           "kWh",
+		transformation: transformAny,
+	},
+	145: {
+		name:           "Power PreHeater total",
+		unit:           "kWh",
+		transformation: transformAny,
+	},
+	146: {
+		name:           "Power PreHeater actual",
+		unit:           "W",
+		transformation: transformAny,
+	},
+	192: {
+		name:           "days_until_next_filter_change",
+		unit:           "days",
+		transformation: transformAirVolume,
+	},
+
+	208: {
+		name:           "z_Unknown_TempHumConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	209: {
+		name:           "RMOT",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	210: {
+		name:           "z_Unknown_TempHumConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	211: {
+		name:           "z_Unknown_TempHumConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	212: {
+		name:           "Target_temperature",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	213: {
+		name:           "Power_avoided_heating_actual",
+		unit:           "W",
+		transformation: transformAny,
+	},
+	214: {
+		name:           "Power_avoided_heating_this_year",
+		unit:           "kWh",
+		transformation: transformAirVolume,
+	},
+	215: {
+		name:           "Power_avoided_heating_lifetime",
+		unit:           "kWh",
+		transformation: transformAirVolume,
+	},
+	216: {
+		name:           "Power_avoided_cooling_actual",
+		unit:           "W",
+		transformation: transformAny,
+	},
+	217: {
+		name:           "Power_avoided_cooling_this_year",
+		unit:           "kWh",
+		transformation: transformAirVolume,
+	},
+	218: {
+		name:           "Power_avoided_cooling_lifetime",
+		unit:           "kWh",
+		transformation: transformAirVolume,
+	},
+	219: {
+		name:           "Power PreHeater Target",
+		unit:           "W",
+		transformation: transformAny,
+	},
+	220: {
+		name:           "temperature_inlet_before_preheater",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	221: {
+		name:           "temperature_inlet_after_recuperator",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	222: {
+		name:           "z_Unknown_TempHumConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	224: {
+		name:           "z_Unknown_VentConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	225: {
+		name:           "z_Unknown_VentConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	226: {
+		name:           "z_Unknown_VentConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	227: {
 		name:           "bypass_open",
 		unit:           "%",
 		transformation: transformSmallNumber,
 	},
+	228: {
+		name:           "frost_disbalance",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	229: {
+		name:           "z_Unknown_VentConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+	230: {
+		name:           "z_Unknown_VentConf",
+		unit:           "",
+		transformation: transformAny,
+	},
+
+	256: {
+		name:           "z_Unknown_NodeConf",
+		unit:           "unknown",
+		transformation: transformAny,
+	},
+	257: {
+		name:           "z_Unknown_NodeConf",
+		unit:           "unknown",
+		transformation: transformAny,
+	},
+
+	273: {
+		name:           "temperature_something...",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	274: {
+		name:           "temperature_outlet_before_recuperator",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	275: {
+		name:           "temperature_outlet_after_recuperator",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	276: {
+		name:           "temperature_inlet_before_preheater",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	277: {
+		name:           "temperature_inlet_before_recuperator",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+	278: {
+		name:           "temperature_inlet_after_recuperator",
+		unit:           "°C",
+		transformation: transformTemperature,
+	},
+
+	289: {
+		name:           "z_unknown_HumSens",
+		unit:           "",
+		transformation: transformAny,
+	},
+	290: {
+		name:           "air_humidity_outlet_before_recuperator",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	291: {
+		name:           "air_humidity_outlet_after_recuperator",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	292: {
+		name:           "air_humidity_inlet_before_preheater",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	293: {
+		name:           "air_humidity_inlet_before_recuperator",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+	294: {
+		name:           "air_humidity_inlet_after_recuperator",
+		unit:           "%",
+		transformation: transformSmallNumber,
+	},
+
+	305: {
+		name:           "PresSens_exhaust",
+		unit:           "Pa",
+		transformation: transformAny,
+	},
+	306: {
+		name:           "PresSens_inlet",
+		unit:           "Pa",
+		transformation: transformAny,
+	},
+
+	369: {
+		name:           "z_Unknown_AnalogInput",
+		unit:           "V?",
+		transformation: transformAny,
+	},
+	370: {
+		name:           "z_Unknown_AnalogInput",
+		unit:           "V?",
+		transformation: transformAny,
+	},
+	371: {
+		name:           "z_Unknown_AnalogInput",
+		unit:           "V?",
+		transformation: transformAny,
+	},
+	372: {
+		name:           "z_Unknown_AnalogInput",
+		unit:           "V?",
+		transformation: transformAny,
+	},
+	400: {
+		name:           "z_Unknown_PostHeater_ActualPower",
+		unit:           "W",
+		transformation: transformAny,
+	},
+	401: {
+		name:           "z_Unknown_PostHeater_ThisYear",
+		unit:           "kWh",
+		transformation: transformAny,
+	},
+	402: {
+		name:           "z_Unknown_PostHeater_Total",
+		unit:           "kWh",
+		transformation: transformAny,
+	},
 }
 
-func toMeasurement(value string) Measurement {
-	if len(value) < 11 {
-		log.Println("found broken message", value)
-		return Measurement{}
-	} else {
-		prefix := string(value[0])
-		address := value[1:9]
-		length := string(value[9])
-		data := strings.Trim(string(value[10:]), "\r")
-
-		dataType, found := mapping[address]
-		if found {
-			//log.Printf("Mapping found for: %s | %s | %s | %s | %s\r", prefix, address, length, data, dataType.name)
-			return Measurement{
-				name:  dataType.name,
-				unit:  dataType.unit,
-				value: dataType.transformation(data),
-			}
-		} else {
-			log.Printf("No mapping for: %s | %s | %s | %s\r", prefix, address, length, data)
-			return Measurement{}
+func toMeasurement(frame CanBusFrame) Measurement {
+	dataType, found := mapping[frame.pdu]
+	if found {
+		//log.Printf("Mapping found for: %s | %d | %s | %s\r", address, length, data, dataType.name)
+		return Measurement{
+			name:  dataType.name,
+			unit:  dataType.unit,
+			value: dataType.transformation(frame.data),
 		}
+	} else {
+		log.Printf("%s | %d | %s\r", frame.id, frame.length, frame.data)
+		return Measurement{}
 	}
+
+	return Measurement{}
 }

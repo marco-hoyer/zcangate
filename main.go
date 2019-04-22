@@ -1,18 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"github.com/tarm/serial"
 	"log"
 	"time"
 )
 
-func readSerial(s *serial.Port) <-chan string {
-	out := make(chan string)
+func readSerial(s *serial.Port) <-chan CanBusFrame {
+	out := make(chan CanBusFrame)
 	newCanBusReader(s, out).Read()
 	return out
 }
 
-func process(in <-chan string) <-chan Measurement {
+func process(in <-chan CanBusFrame) <-chan Measurement {
 	out := make(chan Measurement)
 	go func() {
 		for b := range in {
@@ -26,9 +27,12 @@ func process(in <-chan string) <-chan Measurement {
 
 func logLines(in <-chan Measurement) {
 	go func() {
-		//for b := range in {
-		//	fmt.Println("Measurement: ", b)
-		//}
+		for b := range in {
+			//fmt.Println("")
+			if b.name != "" {
+				fmt.Println("Measurement: ", b)
+			}
+		}
 	}()
 }
 
@@ -48,9 +52,10 @@ func main() {
 	done := make(chan struct{})
 	defer close(done)
 
-	//s.Write([]byte("T1F051051485150801\r"))
+	//s.Write([]byte("T1F011051485150801\r"))
+
 	lines := readSerial(s)
 	messages := process(lines)
 	logLines(messages)
-	time.Sleep(20 * time.Second)
+	time.Sleep(60 * time.Second)
 }
