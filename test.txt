@@ -1,0 +1,199 @@
+Measurement:  {air_volume_output_ventilator m3 129}
+Measurement:  {T0035404129600  0}
+Measurement:  {speed_input_ventilator rpm 1182}
+Measurement:  {T100000010  0}
+Measurement:  {air_volume_input_ventilator m3 133}
+Measurement:  {air_volume_output_ventilator m3 130}
+Measurement:  {T0035404129700  0}
+Measurement:  {speed_input_ventilator rpm 1183}
+2019/04/21 23:48:03 found broken message
+Measurement:  {  0}
+2019/04/21 23:48:03 found broken message
+2019/04/21 23:48:03 found broken message
+Measurement:  {  0}
+Measurement:  {  0}
+Measurement:  {speed_input_ventilator rpm 1179}
+Measurement:  {T100000010  0}
+Measurement:  {air_volume_input_ventilator m3 131}
+Measurement:  {T0035404129800  0}
+Measurement:  {speed_input_ventilator rpm 1171}
+Measurement:  {T100000170  0}
+Measurement:  {speed_output_ventilator rpm 1295}
+Measurement:  {air_volume_input_ventilator m3 130}
+Measurement:  {T0035404129700  0}
+Measurement:  {speed_input_ventilator rpm 1165}
+Measurement:  {T100000010  0}
+Measurement:  {T1F03505780084150101000000  0}
+Measurement:  {T1F03505778100FFFFFFFF03  0}
+Measurement:  {T1F0215C10  0}
+Measurement:  {T00104041103  0}
+Measurement:  {T0038804122C01  0}
+Measurement:  {T004C404120F00  0}
+Measurement:  {T004C804120F00  0}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T0039804180200000000600000  0}
+Measurement:  {T0035404129600  0}
+Measurement:  {speed_input_ventilator rpm 1162}
+Measurement:  {T100000170  0}
+Measurement:  {speed_output_ventilator rpm 1314}
+Measurement:  {T004C804121000  0}
+Measurement:  {power_percent_output_ventilator % 38}
+Measurement:  {power_percent_input_ventilator % 32}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T0035404129700  0}
+Measurement:  {speed_input_ventilator rpm 1188}
+Measurement:  {T100000010  0}
+Measurement:  {speed_output_ventilator rpm 1337}
+Measurement:  {T004C404121000  0}
+Measurement:  {air_volume_output_ventilator m3 134}
+Measurement:  {air_volume_input_ventilator m3 135}
+Measurement:  {T004C804121100  0}
+Measurement:  {T0039804180000000000000000  0}
+Measurement:  {power_percent_output_ventilator % 39}
+Measurement:  {power_percent_input_ventilator % 33}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T0035404129C00  0}
+Measurement:  {speed_input_ventilator rpm 1218}
+Measurement:  {T100000170  0}
+Measurement:  {speed_output_ventilator rpm 1386}
+Measurement:  {T004C404121100  0}
+Measurement:  {air_volume_output_ventilator m3 137}
+Measurement:  {air_volume_input_ventilator m3 140}
+Measurement:  {T004C804121200  0}
+Measurement:  {power_percent_output_ventilator % 54}
+Measurement:  {power_percent_input_ventilator % 48}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T003540412A200  0}
+Measurement:  {speed_input_ventilator rpm 1272}
+Measurement:  {T100000010  0}
+Measurement:  {speed_output_ventilator rpm 1517}
+Measurement:  {T004C404121500  0}
+Measurement:  {power_percent_output_ventilator % 55}
+Measurement:  {air_volume_output_ventilator m3 150}
+Measurement:  {power_percent_input_ventilator % 49}
+Measurement:  {air_volume_input_ventilator m3 153}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C804121600  0}
+Measurement:  {T003540412B200  0}
+Measurement:  {speed_input_ventilator rpm 1410}
+Measurement:  {T100000170  0}
+Measurement:  {speed_output_ventilator rpm 1656}
+Measurement:  {power_percent_output_ventilator % 57}
+Measurement:  {air_volume_output_ventilator m3 173}
+Measurement:  {power_percent_input_ventilator % 50}
+Measurement:  {air_volume_input_ventilator m3 178}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404121C00  0}
+Measurement:  {T004C804121D00  0}
+Measurement:  {T003540412CF00  0}
+Measurement:  {speed_input_ventilator rpm 1567}
+Measurement:  {T100000010  0}
+Measurement:  {T100400014B5A04F24  0}
+Measurement:  {speed_output_ventilator rpm 1774}
+Measurement:  {power_percent_output_ventilator % 59}
+Measurement:  {air_volume_output_ventilator m3 193}
+Measurement:  {power_percent_input_ventilator % 52}
+Measurement:  {air_volume_input_ventilator m3 200}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404122200  0}
+Measurement:  {T004C804122500  0}
+Measurement:  {T003540412E800  0}
+Measurement:  {speed_input_ventilator rpm 1691}
+Measurement:  {T100000170  0}
+Measurement:  {power_percent_output_ventilator % 61}
+Measurement:  {air_volume_output_ventilator m3 210}
+Measurement:  {speed_output_ventilator rpm 1871}
+Measurement:  {power_percent_input_ventilator % 54}
+Measurement:  {air_volume_input_ventilator m3 216}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404122900  0}
+Measurement:  {T004C804122C00  0}
+Measurement:  {T003540412FA00  0}
+Measurement:  {speed_input_ventilator rpm 1793}
+Measurement:  {T100000010  0}
+Measurement:  {power_percent_output_ventilator % 62}
+Measurement:  {air_volume_output_ventilator m3 222}
+Measurement:  {speed_output_ventilator rpm 1957}
+Measurement:  {power_percent_input_ventilator % 55}
+Measurement:  {air_volume_input_ventilator m3 228}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404122E00  0}
+Measurement:  {T004C804123100  0}
+Measurement:  {T0035404120701  0}
+Measurement:  {speed_input_ventilator rpm 1882}
+Measurement:  {T100000170  0}
+Measurement:  {T1F05505780084150101000000  0}
+Measurement:  {T1F05505778100FFFFFFFF01  0}
+Measurement:  {T1F0415C10  0}
+Measurement:  {T00104041101  0}
+Measurement:  {T00490041132  0}
+Measurement:  {T0038804126400  0}
+Measurement:  {power_percent_output_ventilator % 64}
+Measurement:  {air_volume_output_ventilator m3 233}
+Measurement:  {speed_output_ventilator rpm 2027}
+Measurement:  {power_percent_input_ventilator % 57}
+Measurement:  {air_volume_input_ventilator m3 239}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404123300  0}
+Measurement:  {T004C804123500  0}
+Measurement:  {T0035404121101  0}
+Measurement:  {speed_input_ventilator rpm 1954}
+Measurement:  {T100000010  0}
+Measurement:  {T00494041132  0}
+Measurement:  {power_percent_output_ventilator % 47}
+Measurement:  {air_volume_output_ventilator m3 240}
+Measurement:  {speed_output_ventilator rpm 2055}
+Measurement:  {power_percent_input_ventilator % 39}
+Measurement:  {air_volume_input_ventilator m3 247}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404123600  0}
+Measurement:  {T004C804123900  0}
+Measurement:  {T0035404121901  0}
+Measurement:  {speed_input_ventilator rpm 1985}
+Measurement:  {T100000170  0}
+Measurement:  {power_percent_output_ventilator % 46}
+Measurement:  {air_volume_output_ventilator m3 237}
+Measurement:  {speed_output_ventilator rpm 1987}
+Measurement:  {power_percent_input_ventilator % 38}
+Measurement:  {air_volume_input_ventilator m3 245}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404123500  0}
+Measurement:  {T004C804123800  0}
+Measurement:  {T0035404121501  0}
+Measurement:  {speed_input_ventilator rpm 1913}
+Measurement:  {T100000010  0}
+Measurement:  {T00378041100  0}
+Measurement:  {air_volume_output_ventilator m3 224}
+Measurement:  {speed_output_ventilator rpm 1881}
+Measurement:  {air_volume_input_ventilator m3 231}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404122F00  0}
+Measurement:  {T004C804123200  0}
+Measurement:  {T0035404120301  0}
+Measurement:  {speed_input_ventilator rpm 1804}
+Measurement:  {T100000170  0}
+Measurement:  {power_percent_output_ventilator % 44}
+Measurement:  {power_percent_input_ventilator % 36}
+Measurement:  {air_volume_output_ventilator m3 209}
+Measurement:  {speed_output_ventilator rpm 1796}
+Measurement:  {air_volume_input_ventilator m3 215}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404122900  0}
+Measurement:  {T004C804122B00  0}
+Measurement:  {T003540412EF00  0}
+Measurement:  {speed_input_ventilator rpm 1713}
+Measurement:  {T100000010  0}
+Measurement:  {T0045004127300  0}
+Measurement:  {temperature_inlet_before_recuperator °C 11}
+Measurement:  {power_percent_output_ventilator % 43}
+Measurement:  {power_percent_input_ventilator % 35}
+Measurement:  {T0037004127300  0}
+Measurement:  {air_volume_output_ventilator m3 196}
+Measurement:  {speed_output_ventilator rpm 1728}
+Measurement:  {air_volume_input_ventilator m3 202}
+Measurement:  {total_power_consumption W 1.02}
+Measurement:  {T004C404122400  0}
+Measurement:  {T004C804122600  0}
+Measurement:  {T003540412DF00  0}
+Measurement:  {T100000170  0}
+Measurement:  {speed_input_ventilator rpm 1634}

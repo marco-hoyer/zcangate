@@ -54,7 +54,7 @@ func main() {
 
 	//s.Write([]byte("T1F011051485150801\r"))
 	w := CanBusWriter{serial: s}
-	w.write("1F07506A", "8415010100000000003C000001000000")
+	w.write("1F07506A", "8415010100000000FFFFFFFF03")
 
 	//lines := readSerial(s)
 	//messages := process(lines)
