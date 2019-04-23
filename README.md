@@ -6,18 +6,16 @@ This is work in progress and under heavy development.
 
 ## Usage
 
-### Install dependencies
+##### Install dependencies
 
 This project uses [golang dep](https://github.com/golang/dep) for dependency management. 
 
-Install dependencies
-
     dep ensure
     
-Build the project
+##### Build the project
 
     go build .
     
-Run it
+##### Run it
 
     ./zcangate
