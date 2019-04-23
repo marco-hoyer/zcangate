@@ -56,8 +56,8 @@ func main() {
 	w := CanBusWriter{serial: s}
 	w.write("1F07506A", "8415010100000000FFFFFFFF03")
 
-	//lines := readSerial(s)
-	//messages := process(lines)
-	//logLines(messages)
+	lines := readSerial(s)
+	messages := process(lines)
+	logLines(messages)
 	time.Sleep(1 * time.Second)
 }

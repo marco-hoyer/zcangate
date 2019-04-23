@@ -5,28 +5,6 @@ import (
 	"strconv"
 )
 
-//@staticmethod
-//def _to_can_message(frame: bytes) -> Message:
-//try:
-//frame = frame.strip(b'\x07')
-//
-//type = frame[0:1].decode("ascii")
-//assert type.lower() in ["t", "r"], "message type must be T or R, not '{}'".format(type)
-//
-//id = frame[1:9].decode("ascii")
-//length = int(frame[9:10], 16)
-//
-//index = 10
-//data = []
-//
-//for item in range(0, length):
-//data.append(int(frame[index:index + 2], 16))
-//index += 2
-//
-//return Message(type, id, length, data, frame)
-//except Exception as e:
-//print("Could not parse can frame '{}', error was: {}".format(frame, e))
-
 type Type struct {
 	name, unit     string
 	transformation func(string) float64
@@ -40,10 +18,6 @@ type Measurement struct {
 func transformSmallNumber(s string) float64 {
 	v, _ := strconv.ParseInt(s[0:2], 16, 64)
 	return float64(v)
-}
-
-func transformFloat(s string) float64 {
-	return 1.02
 }
 
 func transformTemperature(s string) float64 {
