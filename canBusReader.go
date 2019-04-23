@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -33,8 +32,11 @@ func (c *CanBusReader) Read() {
 					os.Exit(1)
 				}
 			}
+
 			//fmt.Println(line)
-			c.output <- toCanBusFrame(line)
+			if strings.HasPrefix(line, "T") {
+				c.output <- toCanBusFrame(strings.Trim(line, "\r"))
+			}
 		}
 	}()
 }
@@ -85,31 +87,25 @@ func getIdFromPing(binaryId uint64) int {
 }
 
 func toCanBusFrame(line string) CanBusFrame {
-	value := strings.Trim(line, "\r")
+	address := line[1:9]
+	binaryAddress, _ := strconv.ParseUint(address, 16, 32)
 
-	if !strings.HasPrefix(value, "T") || len(value) < 10 {
-		log.Println("found broken message", value)
-		return CanBusFrame{}
-	} else {
-		address := value[1:9]
-		binaryAddress, _ := strconv.ParseUint(address, 16, 32)
+	length, _ := strconv.ParseInt(string(line[9]), 10, 64)
+	pdu := int(binaryAddress >> 14 & 0x7ff)
 
-		length, _ := strconv.ParseInt(string(value[9]), 10, 64)
-		pdu := int(binaryAddress >> 14 & 0x7ff)
-
-		var cn1fAddress CN1FAddress
-		if strings.HasPrefix(address, "1F") {
-			cn1fAddress = CN1FAddressFromBinaryAddress(binaryAddress)
-		}
-
-		return CanBusFrame{
-			id:           address,
-			binaryId:     binaryAddress,
-			pdu:          pdu,
-			length:       int(length),
-			data:         value[10:],
-			CN1FAddress:  cn1fAddress,
-			pingDeviceId: getIdFromPing(binaryAddress),
-		}
+	var cn1fAddress CN1FAddress
+	if strings.HasPrefix(address, "1F") {
+		cn1fAddress = CN1FAddressFromBinaryAddress(binaryAddress)
 	}
+
+	return CanBusFrame{
+		id:           address,
+		binaryId:     binaryAddress,
+		pdu:          pdu,
+		length:       int(length),
+		data:         line[10:],
+		CN1FAddress:  cn1fAddress,
+		pingDeviceId: getIdFromPing(binaryAddress),
+	}
+
 }
