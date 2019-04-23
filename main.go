@@ -52,12 +52,13 @@ func main() {
 	done := make(chan struct{})
 	defer close(done)
 
+	//fmt.Println([]byte("T1F011051485150801\r"))
 	//s.Write([]byte("T1F011051485150801\r"))
 	w := CanBusWriter{serial: s}
-	w.write("1F07506A", "8415010100000000FFFFFFFF03")
+	w.write("1F07506A", "8415010100000000001C000003000000")
 
-	lines := readSerial(s)
-	messages := process(lines)
-	logLines(messages)
+	//lines := readSerial(s)
+	//messages := process(lines)
+	//logLines(messages)
 	time.Sleep(1 * time.Second)
 }
