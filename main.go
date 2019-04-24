@@ -39,23 +39,20 @@ func logLines(in <-chan Measurement) {
 func main() {
 	c := &serial.Config{Name: "/tmp/ttyACM0", Baud: 115200, ReadTimeout: time.Second * 5}
 	s, err := serial.OpenPort(c)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// set CAN bus baud rate and open reading connection
 	s.Write([]byte("S2\r"))
 	s.Write([]byte("O\r"))
 	defer s.Write([]byte("C\r"))
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	done := make(chan struct{})
-	defer close(done)
-
-	//fmt.Println([]byte("T1F011051485150801\r"))
-	//s.Write([]byte("T1F011051485150801\r"))
-	w := CanBusWriter{serial: s}
-	w.write("1F07506A", "8415010100000000001C000003000000")
+	s.Write([]byte("T1F07505180084150101000000\r"))
+	s.Write([]byte("T1F07505178100FFFFFFFF02\r"))
+	//w := CanBusWriter{serial: s}
+	//w.write("1F075051", "8415010100000000FFFFFFFF01")
+	//w.write("1F035057", "8415010100000000FFFFFFFF03")
 
 	//lines := readSerial(s)
 	//messages := process(lines)

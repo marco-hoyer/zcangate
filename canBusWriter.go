@@ -12,6 +12,7 @@ type CanBusWriter struct {
 func (w *CanBusWriter) write(id string, data string) {
 	length := len(data) / 2
 	if length > 8 {
+		fmt.Println("length", length)
 		numberOfDatagrams := length / 7
 		rest := length % 7
 		if rest > 0 {
@@ -21,7 +22,7 @@ func (w *CanBusWriter) write(id string, data string) {
 		n := 0
 		for i := 0; i <= numberOfDatagrams; i++ {
 			chunk := data[i*14 : i*14+14]
-			payload := fmt.Sprintf("T%s%x%02x%s\r", id, len(chunk)/2+1, i, chunk)
+			payload := fmt.Sprintf("T%s%x%02x%s", id, len(chunk)/2+1, i, chunk)
 			fmt.Println("message", payload)
 			w.serial.Write([]byte(payload))
 			n += 1
@@ -29,8 +30,8 @@ func (w *CanBusWriter) write(id string, data string) {
 
 		restLength := (length - n*7) * 2
 		chunk := data[n*14 : n*14+restLength]
-		payload := fmt.Sprintf("T%s%x%02x%s\r", id, len(chunk)/2+1, n|0x88, chunk)
 
+		payload := fmt.Sprintf("T%s%x%02x%s", id, len(chunk)/2+1, n|0x88, chunk)
 		fmt.Println("message", payload)
 		w.serial.Write([]byte(payload))
 	} else {
