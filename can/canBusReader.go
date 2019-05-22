@@ -1,4 +1,4 @@
-package main
+package can
 
 import (
 	"bufio"
@@ -14,7 +14,7 @@ type CanBusReader struct {
 	output          chan CanBusFrame
 }
 
-func newCanBusReader(reader io.Reader, output chan CanBusFrame) *CanBusReader {
+func NewCanBusReader(reader io.Reader, output chan CanBusFrame) *CanBusReader {
 	return &CanBusReader{interfaceReader: reader, output: output}
 }
 
@@ -42,11 +42,11 @@ func (c *CanBusReader) Read() {
 }
 
 type CanBusFrame struct {
-	id           string
-	binaryId     uint64
-	pdu          int
-	length       int
-	data         string
+	Id           string
+	BinaryId     uint64
+	Pdu          int
+	Length       int
+	Data         string
 	CN1FAddress  CN1FAddress
 	pingDeviceId int
 }
@@ -78,7 +78,7 @@ func CN1FAddressFromBinaryAddress(a uint64) CN1FAddress {
 }
 
 func getIdFromPing(binaryId uint64) int {
-	// address 1000000x indicates a heartbeat from a CAN bus device with id x
+	// address 1000000x indicates a heartbeat from a CAN bus device with Id x
 	if binaryId&0xFFFFFFC0 == 0x10000000 {
 		return int(binaryId & 0x3f)
 	} else {
@@ -99,11 +99,11 @@ func toCanBusFrame(line string) CanBusFrame {
 	}
 
 	return CanBusFrame{
-		id:           address,
-		binaryId:     binaryAddress,
-		pdu:          pdu,
-		length:       int(length),
-		data:         line[10:],
+		Id:           address,
+		BinaryId:     binaryAddress,
+		Pdu:          pdu,
+		Length:       int(length),
+		Data:         line[10:],
 		CN1FAddress:  cn1fAddress,
 		pingDeviceId: getIdFromPing(binaryAddress),
 	}

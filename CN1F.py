@@ -24,15 +24,7 @@ class CN1FAddr:
                 (CID >> 16) & 0x01,
                 (CID >> 17) & 0x03)
 
-    def __repr__(self):
-        return (f'{self.__class__.__name__}(\n'
-                f'  SrcAddr = {self.SrcAddr:#02x},\n'
-                f'  DstAddr = {self.DstAddr:#02x},\n'
-                f'  Address = {self.Address:#02x},\n'
-                f'  MultiMsg = {self.MultiMsg:#02x},\n'
-                f'  A8000 = {self.A8000:#02x},\n'
-                f'  A10000 = {self.A10000:#02x},\n'
-                f'  SeqNr = {self.SeqNr:#02x})')
+
 
     def CanID(self):
         addr = 0x0
@@ -77,9 +69,9 @@ class CN1FAddr:
             self.canwrite(self.CanID(), data)
 
 
-cn1f = CN1FAddr(0x11, 0x1, 0x1, 0x1, 0x0, 0x1, 0x3)
+cn1f = CN1FAddr(0x11, 0x1, 0x1, 0x1, 0x0, 0x1, 0x0)
 print(type(cn1f.CanID()))
-print(cn1f.CanID())
+print("CANID")
 print(hex(cn1f.CanID()))
 
 print("fromCANid", CN1FAddr.fromCanID(0x1F075057))

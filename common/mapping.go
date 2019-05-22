@@ -1,8 +1,9 @@
-package main
+package common
 
 import (
 	"log"
 	"strconv"
+	"github.com/marco-hoyer/zcangate/can"
 )
 
 type Type struct {
@@ -431,17 +432,17 @@ var mapping = map[int]Type{
 	},
 }
 
-func toMeasurement(frame CanBusFrame) Measurement {
-	dataType, found := mapping[frame.pdu]
+func ToMeasurement(frame can.CanBusFrame) Measurement {
+	dataType, found := mapping[frame.Pdu]
 	if found {
 		//log.Printf("Mapping found for: %s | %d | %s | %s\r", address, length, data, dataType.name)
 		return Measurement{
 			name:  dataType.name,
 			unit:  dataType.unit,
-			value: dataType.transformation(frame.data),
+			value: dataType.transformation(frame.Data),
 		}
 	} else {
-		log.Printf("%s | %d | %s\r", frame.id, frame.length, frame.data)
+		log.Printf("Unknown message: %s | %d | %s\r", frame.Id, frame.Length, frame.Data)
 		return Measurement{}
 	}
 

@@ -2,6 +2,26 @@
 
 
 [[projects]]
+  digest = "1:3af6be4fee7c08f81f13d36f04ffb63ad4b6b5aaba12cce96095c7c2863d4912"
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ed099d42384823742bba0bf9a72b53b55c9e2e38"
+  version = "v1.7.2"
+
+[[projects]]
+  digest = "1:3c6faaeb500b7e6fadbe52c0b3fd62b6eed7801ed0d74bb3bd9577017df8d2f4"
+  name = "github.com/influxdata/influxdb"
+  packages = [
+    "client/v2",
+    "models",
+    "pkg/escape",
+  ]
+  pruneopts = "UT"
+  revision = "01c8dd416270f424ab0c40f9291e269ac6921964"
+  version = "v1.7.6"
+
+[[projects]]
   branch = "master"
   digest = "1:52b21e6be25049834aea5ecdde35d723c00fbdad3ea0357f2072dfb105836e02"
   name = "github.com/tarm/serial"
@@ -20,6 +40,10 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/tarm/serial"]
+  input-imports = [
+    "github.com/gorilla/mux",
+    "github.com/influxdata/influxdb/client/v2",
+    "github.com/tarm/serial",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
