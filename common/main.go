@@ -22,7 +22,9 @@ func runApiServer(s *serial.Port, w *can.CanBusWriter) {
 
 func readSerial(s *serial.Port) <-chan can.CanBusFrame {
 	out := make(chan can.CanBusFrame)
-	can.NewCanBusReader(s, out).Read()
+	go func() {
+		can.NewCanBusReader(s, out).Read()
+	}()
 	return out
 }
 
@@ -49,8 +51,6 @@ func sendMeasurement(in <-chan Measurement, i Influxdb) {
 		}
 	}()
 }
-
-
 
 func MainLoop() {
 	c := &serial.Config{Name: "/tmp/ttyACM0", Baud: 115200, ReadTimeout: time.Second * 5}
@@ -82,7 +82,6 @@ func MainLoop() {
 	//w := CanBusWriter{serial: s}
 	//w.write("1F075051", "8415010100000000FFFFFFFF01")
 	//w.write("1F035057", "8415010100000000FFFFFFFF03")
-
 
 	var wg sync.WaitGroup
 	wg.Add(1)

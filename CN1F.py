@@ -12,17 +12,14 @@ class CN1FAddr:
 
     @classmethod
     def fromCanID(cls, CID):
-        if (CID >> 24) != 0x1F:
-            raise ValueError('Not 0x1F CMD!')
-        else:
-            return cls(
-                (CID >> 0) & 0x3f,
-                (CID >> 6) & 0x3f,
-                (CID >> 12) & 0x03,
-                (CID >> 14) & 0x01,
-                (CID >> 15) & 0x01,
-                (CID >> 16) & 0x01,
-                (CID >> 17) & 0x03)
+        return cls(
+            (CID >> 0) & 0x3f,
+            (CID >> 6) & 0x3f,
+            (CID >> 12) & 0x03,
+            (CID >> 14) & 0x01,
+            (CID >> 15) & 0x01,
+            (CID >> 16) & 0x01,
+            (CID >> 17) & 0x03)
 
 
 
@@ -74,6 +71,9 @@ print(type(cn1f.CanID()))
 print("CANID")
 print(hex(cn1f.CanID()))
 
-print("fromCANid", CN1FAddr.fromCanID(0x1F075057))
+print("fromCANid", CN1FAddr.fromCanID(0x10080017))
 
-cn1f.write_CN_Msg([0x84, 0x15, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00])
+# cn1f.write_CN_Msg([0x84, 0x15, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00])
+
+
+print((7 + 1) & 0x3)
