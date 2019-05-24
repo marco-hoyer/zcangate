@@ -6,7 +6,7 @@ RUN dep ensure
 RUN env GOOS=linux GOARCH=arm GOARM=6 go build
 
 FROM arm64v8/alpine:3.9
-COPY --from=0 /go/src/zcangate /usr/bin/zcangate
+COPY --from=0 /go/src/zcangate/zcangate /usr/bin/zcangate
 
 EXPOSE 8080
 ENTRYPOINT ["zcangate"]
