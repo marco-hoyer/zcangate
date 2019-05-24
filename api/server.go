@@ -22,10 +22,15 @@ func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 	command := vars["command"]
 	log.Println("Received command: ", command)
 
-	s.CanBusWriter.Write("1F015051", "8415010100000000FFFFFFFF03")
-	s.CanBusWriter.Write("1F035051", "8415010100000000FFFFFFFF03")
-	s.CanBusWriter.Write("1F055051", "8415010100000000FFFFFFFF03")
-	s.CanBusWriter.Write("1F075051", "8415010100000000FFFFFFFF03")
+	//s.CanBusWriter.Write("1F015057", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F035057", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F055057", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F075057", "84150101000000000100000003")
+
+	s.SerialInterface.Write([]byte("1F01505785150801"))
+	s.SerialInterface.Write([]byte("1F03505785150801"))
+	s.SerialInterface.Write([]byte("1F05505785150801"))
+	s.SerialInterface.Write([]byte("1F07505785150801"))
 
 	w.Write([]byte("OK"))
 }
