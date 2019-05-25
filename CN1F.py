@@ -26,14 +26,22 @@ class CN1FAddr:
     def CanID(self):
         addr = 0x0
         addr |= self.SrcAddr << 0
+        print(addr)
         addr |= self.DstAddr << 6
+        print(addr)
 
         addr |= self.Address << 12
+        print(addr)
         addr |= self.MultiMsg << 14
+        print(addr)
         addr |= self.A8000 << 15
+        print(addr)
         addr |= self.A10000 << 16
+        print(addr)
         addr |= self.SeqNr << 17
+        print(addr)
         addr |= 0x1F << 24
+        print(addr)
 
         return addr
 
@@ -66,9 +74,10 @@ class CN1FAddr:
             self.canwrite(self.CanID(), data)
 
 
-cn1f = CN1FAddr(0x17, 0x1, 0x1, 0x1, 0x0, 0x1, 0x0)
+cn1f = CN1FAddr(0x34, 0x1, 0x1, 0x0, 0x0, 0x1, 0x1)
 print(type(cn1f.CanID()))
 print("CANID")
+print(cn1f.CanID())
 print(hex(cn1f.CanID()))
 
 print("fromCANid", CN1FAddr.fromCanID(0x10080017))

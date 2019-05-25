@@ -22,6 +22,14 @@
   version = "v1.7.6"
 
 [[projects]]
+  digest = "1:23472f69a3ee7225de2f104aa48c6456959d1c155e45035c9845806d83109190"
+  name = "github.com/stretchr/objx"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ea4fe68685ee0d3cee7032121851b57e7494e8ea"
+  version = "v0.2.0"
+
+[[projects]]
   branch = "master"
   digest = "1:52b21e6be25049834aea5ecdde35d723c00fbdad3ea0357f2072dfb105836e02"
   name = "github.com/tarm/serial"
@@ -43,6 +51,7 @@
   input-imports = [
     "github.com/gorilla/mux",
     "github.com/influxdata/influxdb/client/v2",
+    "github.com/stretchr/objx",
     "github.com/tarm/serial",
   ]
   solver-name = "gps-cdcl"

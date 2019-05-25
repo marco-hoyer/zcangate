@@ -1,11 +1,11 @@
 package api
 
 import (
-	"net/http"
 	"github.com/gorilla/mux"
-	"log"
-	"github.com/tarm/serial"
 	"github.com/marco-hoyer/zcangate/can"
+	"github.com/tarm/serial"
+	"log"
+	"net/http"
 )
 
 type WebServer struct {
@@ -22,17 +22,19 @@ func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 	command := vars["command"]
 	log.Println("Received command: ", command)
 
-	//s.CanBusWriter.Write("1F015057", "84150101000000000100000003")
-	//s.CanBusWriter.Write("1F035057", "84150101000000000100000003")
-	//s.CanBusWriter.Write("1F055057", "84150101000000000100000003")
-	//s.CanBusWriter.Write("1F075057", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F015074", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F035074", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F055074", "84150101000000000100000003")
+	//s.CanBusWriter.Write("1F075074", "84150101000000000100000003")
 
-	s.SerialInterface.Write([]byte("1F01505785150801"))
-	s.SerialInterface.Write([]byte("1F03505785150801"))
-	s.SerialInterface.Write([]byte("1F05505785150801"))
-	s.SerialInterface.Write([]byte("1F07505785150801"))
+	//s.CanBusWriter.Write("1F011074", "85150801")
+	//s.CanBusWriter.Write("1F031074", "85150801")
+	//s.CanBusWriter.Write("1F051074", "85150801")
+	//s.CanBusWriter.Write("1F071074", "85150801")
 
-	w.Write([]byte("OK"))
+	s.CanBusWriter.WriteCommand(0x34, 0x1, 0x0, "85150801")
+
+	w.Write([]byte("OK setting auto mode"))
 }
 
 func (s *WebServer) Run() {

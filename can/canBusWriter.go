@@ -2,13 +2,43 @@ package can
 
 import (
 	"fmt"
+	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/tarm/serial"
 	"log"
 	"strings"
 )
 
+const sequenceNumberStateKey = "canCommandSequenceNumber"
+
 type CanBusWriter struct {
-	Serial *serial.Port
+	Serial   *serial.Port
+	StateDao dao.StateDao
+}
+
+func GenerateAddress(source int, destination int, fragmentation int, sequenceNumber int) string {
+	addr := 0x0
+	addr |= source << 0
+	addr |= destination << 6
+
+	addr |= 0x1 << 12
+	addr |= fragmentation << 14
+	addr |= 0x0 << 15
+	addr |= 0x1 << 16
+	addr |= sequenceNumber << 17
+	addr |= 0x1F << 24
+
+	return fmt.Sprintf("%X", addr)
+}
+
+func (w *CanBusWriter) WriteCommand(source int, destination int, fragmentation int, data string) {
+	oldSequenceNumber := w.StateDao.GetInt(sequenceNumberStateKey)
+	sequenceNumber := (oldSequenceNumber + 1) & 0x3
+	w.StateDao.Set(sequenceNumberStateKey, sequenceNumber)
+	log.Println("using sequence number: ", sequenceNumber)
+
+	address := GenerateAddress(source, destination, fragmentation, sequenceNumber)
+	log.Println("Generated address: ", address)
+	w.Write(address, data)
 }
 
 func (w *CanBusWriter) Write(id string, data string) {
@@ -36,19 +66,20 @@ func (w *CanBusWriter) Write(id string, data string) {
 		w.writeAndWait(payload)
 	} else {
 		//w.Serial.Write(f.toBytes())
-		fmt.Println("not implemented yet")
+		payload := fmt.Sprintf("T%s%x%s\r", id, len(data)/2, data)
+		w.writeAndWait(payload)
 	}
 }
 
 func (w *CanBusWriter) writeAndWait(payload string) {
-	fmt.Println("message string: ", payload)
-	fmt.Println("message ascii: ", []byte(payload))
+	fmt.Println("command string: ", payload)
+	fmt.Println("command ascii: ", []byte(payload))
 
 	w.Serial.Flush()
 	w.Serial.Write([]byte(payload))
 
 	response := make([]byte, 128)
-	retries := 50
+	var retries = 50
 	for {
 		w.Serial.Read(response)
 		//log.Println("raw response: ", response)

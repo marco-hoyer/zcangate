@@ -1,13 +1,14 @@
 package common
 
 import (
-	"github.com/tarm/serial"
-	"log"
-	"time"
-	"sync"
 	"fmt"
 	"github.com/marco-hoyer/zcangate/api"
 	"github.com/marco-hoyer/zcangate/can"
+	"github.com/marco-hoyer/zcangate/dao"
+	"github.com/tarm/serial"
+	"log"
+	"sync"
+	"time"
 )
 
 func runApiServer(s *serial.Port, w *can.CanBusWriter) {
@@ -60,28 +61,33 @@ func MainLoop() {
 		panic(1)
 	}
 
+	stateDao := dao.NewStateDao()
+
 	log.Println("Connecting to influxdb")
 	i := Influxdb{}
 	i.Connect()
 	defer i.Disconnect()
 
-	w := can.CanBusWriter{Serial: s}
+	w := can.CanBusWriter{Serial: s, StateDao: stateDao}
 
 	log.Println("Starting webserver")
 	runApiServer(s, &w)
 
 	log.Println("opening CAN interface connection")
 	// set CAN bus baud rate and open reading connection
-	s.Write([]byte("S2\r"))
-	s.Write([]byte("O\r"))
+	s.Write([]byte("\r\r\rC\rS2\rO\r"))
 	defer s.Write([]byte("C\r"))
+
+	//w.Write("1F015074", "84150101000000000100000003")
+	//w.Write("1F035074", "84150101000000000100000003")
+	//w.Write("1F055074", "84150101000000000100000003")
+	//w.Write("1F075074", "84150101000000000100000003")
 
 	log.Println("finished opening CAN interface")
 	//s.Write([]byte("T1F07505180084150101000000\r"))
 	//s.Write([]byte("T1F07505178100FFFFFFFF02\r"))
 	//w := CanBusWriter{serial: s}
 	//w.write("1F075051", "8415010100000000FFFFFFFF01")
-	//w.write("1F035057", "8415010100000000FFFFFFFF03")
 
 	var wg sync.WaitGroup
 	wg.Add(1)
