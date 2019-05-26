@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=7
+VERSION=8
 
 docker login
 

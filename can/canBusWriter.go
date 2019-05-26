@@ -90,7 +90,8 @@ func (w *CanBusWriter) writeAndWait(payload string) {
 
 		retries--
 		if retries < 1 {
-			panic("timeout receiving command ACK")
+			log.Println("COMMAND TIMED OUT")
+			break
 
 		}
 	}
