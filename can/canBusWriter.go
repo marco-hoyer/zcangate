@@ -43,8 +43,8 @@ func (w *CanBusWriter) WriteCommand(source int, destination int, fragmentation i
 
 func (w *CanBusWriter) Write(id string, data string) {
 	length := len(data) / 2
+	log.Println("Length", length)
 	if length > 8 {
-		fmt.Println("Length", length)
 		numberOfDatagrams := length / 7
 		rest := length % 7
 		if rest > 0 {
@@ -62,7 +62,7 @@ func (w *CanBusWriter) Write(id string, data string) {
 		restLength := (length - n*7) * 2
 		chunk := data[n*14 : n*14+restLength]
 
-		payload := fmt.Sprintf("T%s%x%02x%s\r", id, len(chunk)/2+1, n|0x88, chunk)
+		payload := fmt.Sprintf("T%s%x%02x%s\r", id, len(chunk)/2+1, n|0x80, chunk)
 		w.writeAndWait(payload)
 	} else {
 		//w.Serial.Write(f.toBytes())
