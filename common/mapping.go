@@ -24,7 +24,10 @@ func transformSmallNumber(s string) float64 {
 func transformTemperature(s string) float64 {
 	v1, _ := strconv.ParseInt(s[0:2], 16, 64)
 	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
-	return float64((v1 - v2) / 10)
+
+	value := float64((v1 - v2) / 10)
+	log.Println("Transformed temperature value '", s, "' into: ", value)
+	return value
 }
 
 func transformAirVolume(s string) float64 {
