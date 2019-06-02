@@ -6,6 +6,7 @@ import (
 	"github.com/tarm/serial"
 	"log"
 	"strings"
+	"time"
 )
 
 const sequenceNumberStateKey = "canCommandSequenceNumber"
@@ -72,6 +73,14 @@ func (w *CanBusWriter) Write(id string, data string) {
 }
 
 func (w *CanBusWriter) writeAndWait(payload string) {
+	fmt.Println("command string: ", payload)
+	fmt.Println("command ascii: ", []byte(payload))
+
+	w.Serial.Write([]byte(payload))
+	time.Sleep(500 * time.Millisecond)
+}
+
+func (w *CanBusWriter) writeAndWait2(payload string) {
 	fmt.Println("command string: ", payload)
 	fmt.Println("command ascii: ", []byte(payload))
 

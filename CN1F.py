@@ -74,15 +74,51 @@ class CN1FAddr:
             self.canwrite(self.CanID(), data)
 
 
-cn1f = CN1FAddr(0x34, 0x1, 0x1, 0x0, 0x0, 0x1, 0x1)
+cn1f = CN1FAddr(11, 1, 0x1, 0x0, 0x0, 0x1, 0x1)
 print(type(cn1f.CanID()))
 print("CANID")
 print(cn1f.CanID())
 print(hex(cn1f.CanID()))
 
-print("fromCANid", CN1FAddr.fromCanID(0x10080017))
+addr = 0x1F015074
+print(addr)
+print("Src", CN1FAddr.fromCanID(addr).SrcAddr)
+print("Dst", CN1FAddr.fromCanID(addr).DstAddr)
+print("Address", CN1FAddr.fromCanID(addr).Address)
+print("MultiMsg", CN1FAddr.fromCanID(addr).MultiMsg)
+print("A8000", CN1FAddr.fromCanID(addr).A8000)
+print("A10000", CN1FAddr.fromCanID(addr).A10000)
+print("Seq", CN1FAddr.fromCanID(addr).SeqNr)
+
+addr = 0x1F061D01
+print(addr)
+print("Src", CN1FAddr.fromCanID(addr).SrcAddr)
+print("Dst", CN1FAddr.fromCanID(addr).DstAddr)
+print("Address", CN1FAddr.fromCanID(addr).Address)
+print("MultiMsg", CN1FAddr.fromCanID(addr).MultiMsg)
+print("A8000", CN1FAddr.fromCanID(addr).A8000)
+print("A10000", CN1FAddr.fromCanID(addr).A10000)
+print("Seq", CN1FAddr.fromCanID(addr).SeqNr)
+
+addr = 0x1F015057
+print(addr)
+print("Src", CN1FAddr.fromCanID(addr).SrcAddr)
+print("Dst", CN1FAddr.fromCanID(addr).DstAddr)
+print("Address", CN1FAddr.fromCanID(addr).Address)
+print("MultiMsg", CN1FAddr.fromCanID(addr).MultiMsg)
+print("A8000", CN1FAddr.fromCanID(addr).A8000)
+print("A10000", CN1FAddr.fromCanID(addr).A10000)
+print("Seq", CN1FAddr.fromCanID(addr).SeqNr)
+
+addr = 0x1F011074
+print(addr)
+print("Src", CN1FAddr.fromCanID(addr).SrcAddr)
+print("Dst", CN1FAddr.fromCanID(addr).DstAddr)
+print("Address", CN1FAddr.fromCanID(addr).Address)
+print("MultiMsg", CN1FAddr.fromCanID(addr).MultiMsg)
+print("A8000", CN1FAddr.fromCanID(addr).A8000)
+print("A10000", CN1FAddr.fromCanID(addr).A10000)
+print("Seq", CN1FAddr.fromCanID(addr).SeqNr)
 
 # cn1f.write_CN_Msg([0x84, 0x15, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00])
 
-
-print((7 + 1) & 0x3)
