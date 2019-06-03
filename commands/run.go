@@ -1,9 +1,9 @@
 package commands
 
 import (
-"github.com/marco-hoyer/zcangate/common"
+	"github.com/marco-hoyer/zcangate/app"
 )
 
 func Run() {
-	common.MainLoop()
+	app.MainLoop()
 }

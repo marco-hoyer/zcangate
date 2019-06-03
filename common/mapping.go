@@ -12,8 +12,8 @@ type Type struct {
 }
 
 type Measurement struct {
-	name, unit string
-	value      float64
+	Name, Unit string
+	Value      float64
 }
 
 func transformSmallNumber(s string) float64 {
@@ -26,7 +26,7 @@ func transformTemperature(s string) float64 {
 	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
 
 	value := float64((v1 + v2*255) / 10)
-	log.Println("Transformed temperature value '", s, "' into: ", value)
+	log.Println("Transformed temperature Value '", s, "' into: ", value)
 	return value
 }
 
@@ -438,11 +438,11 @@ var mapping = map[int]Type{
 func ToMeasurement(frame can.CanBusFrame) Measurement {
 	dataType, found := mapping[frame.Pdu]
 	if found {
-		//log.Printf("Mapping found for: %s | %d | %s | %s\r", address, length, data, dataType.name)
+		//log.Printf("Mapping found for: %s | %d | %s | %s\r", address, length, data, dataType.Name)
 		return Measurement{
-			name:  dataType.name,
-			unit:  dataType.unit,
-			value: dataType.transformation(frame.Data),
+			Name:  dataType.name,
+			Unit:  dataType.unit,
+			Value: dataType.transformation(frame.Data),
 		}
 	} else {
 		log.Printf("Unknown message: %s | %d | %s\r", frame.Id, frame.Length, frame.Data)

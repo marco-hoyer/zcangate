@@ -6,6 +6,8 @@ import (
 	"github.com/tarm/serial"
 	"log"
 	"net/http"
+	"github.com/marco-hoyer/zcangate/common"
+	"encoding/json"
 )
 
 type WebServer struct {
@@ -14,46 +16,32 @@ type WebServer struct {
 }
 
 func commandsIndexHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("c1, c2, c3"))
+	commands := make([]string, len(common.Commands))
+
+	i := 0
+	for k := range common.Commands {
+		commands[i] = k
+		i++
+	}
+
+	enc := json.NewEncoder(w)
+	enc.Encode(commands)
 }
 
 func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	command := vars["command"]
-	log.Println("Received command: ", command)
+	commandQueryParam := vars["command"]
+	log.Println("command query param ", commandQueryParam)
+	command, found := common.Commands[commandQueryParam]
 
-	switch command {
-	case "auto":
-		log.Println("Putting unit into auto mode")
-		s.CanBusWriter.WriteCommand(11, 1, 0x0, "85150801")
-	case "manual":
-		log.Println("Putting unit into manual mode")
-		s.CanBusWriter.WriteCommand(11, 1, 0x1, "84150801000000000100000001")
-	case "3":
-		log.Println("Setting ventilation level to 3")
-		s.CanBusWriter.WriteCommand(11, 1, 0x1, "8415010100000000FFFFFFFF03")
-	case "2":
-		log.Println("Setting ventilation level to 0")
-		s.CanBusWriter.WriteCommand(11, 1, 0x1, "8415010100000000FFFFFFFF02")
-	case "1":
-		log.Println("Setting ventilation level to 0")
-		s.CanBusWriter.WriteCommand(11, 1, 0x1, "8415010100000000FFFFFFFF01")
-	case "0":
-		log.Println("Setting ventilation level to 0")
-		s.CanBusWriter.WriteCommand(11, 1, 0x1, "8415010100000000FFFFFFFF00")
+	if found {
+		log.Println("executing command: ", commandQueryParam)
+		s.CanBusWriter.WriteCommand(11, 1, command.Fragmentation, command.Code)
+		w.Write([]byte("OK"))
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("ERROR, command not found"))
 	}
-
-	//s.CanBusWriter.Write("1F015074", "84150101000000000100000003")
-	//s.CanBusWriter.Write("1F035074", "84150101000000000100000003")
-	//s.CanBusWriter.Write("1F055074", "84150101000000000100000003")
-	//s.CanBusWriter.Write("1F075074", "84150101000000000100000003")
-
-	//s.CanBusWriter.Write("1F011074", "85150801")
-	//s.CanBusWriter.Write("1F031074", "85150801")
-	//s.CanBusWriter.Write("1F051074", "85150801")
-	//s.CanBusWriter.Write("1F071074", "85150801")
-
-	w.Write([]byte("OK"))
 }
 
 func (s *WebServer) Run() {

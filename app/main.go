@@ -1,10 +1,10 @@
-package common
+package app
 
 import (
-	"fmt"
 	"github.com/marco-hoyer/zcangate/api"
 	"github.com/marco-hoyer/zcangate/can"
 	"github.com/marco-hoyer/zcangate/dao"
+	"github.com/marco-hoyer/zcangate/common"
 	"github.com/tarm/serial"
 	"log"
 	"sync"
@@ -29,25 +29,23 @@ func readSerial(s *serial.Port) <-chan can.CanBusFrame {
 	return out
 }
 
-func process(in <-chan can.CanBusFrame) <-chan Measurement {
-	out := make(chan Measurement)
+func process(in <-chan can.CanBusFrame) <-chan common.Measurement {
+	out := make(chan common.Measurement)
 	go func() {
 		for b := range in {
 
 			//log.Println(b)
-			out <- ToMeasurement(b)
+			out <- common.ToMeasurement(b)
 		}
 	}()
 	return out
 }
 
-func sendMeasurement(in <-chan Measurement, i Influxdb) {
+func sendMeasurement(in <-chan common.Measurement, i Influxdb) {
 	go func() {
 		for b := range in {
-			//fmt.Println("")
-			if b.name != "" {
-				i.Send(b.name, "Haus", b.unit, "1", b.value)
-				fmt.Println("Measurement: ", b)
+			if b.Name != "" {
+				i.Send(b.Name, "Haus", b.Unit, "1", b.Value)
 			}
 		}
 	}()
@@ -77,17 +75,6 @@ func MainLoop() {
 	// set CAN bus baud rate and open reading connection
 	s.Write([]byte("\r\r\rC\rS2\rO\r"))
 	defer s.Write([]byte("C\r"))
-
-	//w.Write("1F015074", "84150101000000000100000003")
-	//w.Write("1F035074", "84150101000000000100000003")
-	//w.Write("1F055074", "84150101000000000100000003")
-	//w.Write("1F075074", "84150101000000000100000003")
-
-	log.Println("finished opening CAN interface")
-	//s.Write([]byte("T1F07505180084150101000000\r"))
-	//s.Write([]byte("T1F07505178100FFFFFFFF02\r"))
-	//w := CanBusWriter{serial: s}
-	//w.write("1F075051", "8415010100000000FFFFFFFF01")
 
 	var wg sync.WaitGroup
 	wg.Add(1)
