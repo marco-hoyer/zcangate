@@ -25,7 +25,7 @@ func transformTemperature(s string) float64 {
 	v1, _ := strconv.ParseInt(s[0:2], 16, 64)
 	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
 
-	value := float64((v1 + v2*255) / 10)
+	value := float64(v1 + v2*255) / float64(10)
 	log.Println("Transformed temperature Value '", s, "' into: ", value)
 	return value
 }

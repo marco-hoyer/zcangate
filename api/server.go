@@ -1,12 +1,12 @@
 package api
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/marco-hoyer/zcangate/can"
+	"github.com/marco-hoyer/zcangate/common"
+	"github.com/gorilla/mux"
 	"github.com/tarm/serial"
 	"log"
 	"net/http"
-	"github.com/marco-hoyer/zcangate/common"
 	"encoding/json"
 )
 
