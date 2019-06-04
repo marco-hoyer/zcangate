@@ -22,6 +22,14 @@
   version = "v1.7.6"
 
 [[projects]]
+  branch = "master"
+  digest = "1:d6bb6f3240a488ffe5bb6952b513569d009927dcb20ff94885f87b76cef2b698"
+  name = "github.com/streadway/amqp"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "75d898a42a940fbc854dfd1a4199eabdc00cf024"
+
+[[projects]]
   digest = "1:23472f69a3ee7225de2f104aa48c6456959d1c155e45035c9845806d83109190"
   name = "github.com/stretchr/objx"
   packages = ["."]
@@ -51,6 +59,7 @@
   input-imports = [
     "github.com/gorilla/mux",
     "github.com/influxdata/influxdb/client/v2",
+    "github.com/streadway/amqp",
     "github.com/stretchr/objx",
     "github.com/tarm/serial",
   ]

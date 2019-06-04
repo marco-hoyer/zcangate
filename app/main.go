@@ -6,9 +6,11 @@ import (
 	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/marco-hoyer/zcangate/common"
 	"github.com/tarm/serial"
+	"github.com/streadway/amqp"
 	"log"
 	"sync"
 	"time"
+	"encoding/json"
 )
 
 func runApiServer(s *serial.Port, w *can.CanBusWriter) {
@@ -41,11 +43,13 @@ func process(in <-chan can.CanBusFrame) <-chan common.Measurement {
 	return out
 }
 
-func sendMeasurement(in <-chan common.Measurement, i Influxdb) {
+func sendMeasurement(in <-chan common.Measurement, i Influxdb, m AmqpClient, q amqp.Queue) {
 	go func() {
 		for b := range in {
 			if b.Name != "" {
 				i.Send(b.Name, "Haus", b.Unit, "1", b.Value)
+				jsonBytes, _ := json.Marshal(b)
+				m.Publish(q, jsonBytes)
 			}
 		}
 	}()
@@ -66,6 +70,12 @@ func MainLoop() {
 	i.Connect()
 	defer i.Disconnect()
 
+	log.Println("Connecting to RabbitMq Server")
+	amqpClient := AmqpClient{}
+	amqpClient.Connect()
+	queue := amqpClient.QueueDeclare("ventilation/measurements")
+	defer amqpClient.Disconnect()
+
 	w := can.CanBusWriter{Serial: s, StateDao: stateDao}
 
 	log.Println("Starting webserver")
@@ -82,7 +92,7 @@ func MainLoop() {
 	log.Println("reading messages")
 	lines := readSerial(s)
 	messages := process(lines)
-	sendMeasurement(messages, i)
+	sendMeasurement(messages, i, amqpClient, queue)
 
 	wg.Wait()
 }
