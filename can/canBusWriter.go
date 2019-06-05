@@ -10,6 +10,7 @@ import (
 )
 
 const sequenceNumberStateKey = "canCommandSequenceNumber"
+const ComfoAirId = "canComfoAirId"
 
 type CanBusWriter struct {
 	Serial   *serial.Port
@@ -31,13 +32,16 @@ func GenerateAddress(source int, destination int, fragmentation int, sequenceNum
 	return fmt.Sprintf("%X", addr)
 }
 
-func (w *CanBusWriter) WriteCommand(source int, destination int, fragmentation int, data string) {
+func (w *CanBusWriter) WriteCommand(fragmentation int, data string) {
 	oldSequenceNumber := w.StateDao.GetInt(sequenceNumberStateKey)
 	sequenceNumber := (oldSequenceNumber + 1) & 0x3
 	w.StateDao.Set(sequenceNumberStateKey, sequenceNumber)
-	log.Println("using sequence number: ", sequenceNumber)
 
-	address := GenerateAddress(source, destination, fragmentation, sequenceNumber)
+	comfoAirId := w.StateDao.GetInt(ComfoAirId)
+
+	log.Println("sending command to hex id:", comfoAirId, " with sequence number: ", sequenceNumber)
+
+	address := GenerateAddress(comfoAirId+1, comfoAirId, fragmentation, sequenceNumber)
 	log.Println("Generated address: ", address)
 	w.Write(address, data)
 }

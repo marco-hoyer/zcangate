@@ -36,7 +36,7 @@ func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 
 	if found {
 		log.Println("executing command: ", commandQueryParam)
-		s.CanBusWriter.WriteCommand(11, 1, command.Fragmentation, command.Code)
+		s.CanBusWriter.WriteCommand(command.Fragmentation, command.Code)
 		w.Write([]byte("OK"))
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -48,7 +48,7 @@ type CanBusFrame struct {
 	Length       int
 	Data         string
 	CN1FAddress  CN1FAddress
-	pingDeviceId int
+	PingDeviceId uint64
 }
 
 func (f CanBusFrame) toBytes() []byte {
@@ -77,10 +77,10 @@ func CN1FAddressFromBinaryAddress(a uint64) CN1FAddress {
 	}
 }
 
-func getIdFromPing(binaryId uint64) int {
+func getIdFromPing(binaryId uint64) uint64 {
 	// address 1000000x indicates a heartbeat from a CAN bus device with Id x
 	if binaryId&0xFFFFFFC0 == 0x10000000 {
-		return int(binaryId & 0x3f)
+		return uint64(binaryId & 0x3f)
 	} else {
 		return 0
 	}
@@ -105,7 +105,7 @@ func toCanBusFrame(line string) CanBusFrame {
 		Length:       int(length),
 		Data:         line[10:],
 		CN1FAddress:  cn1fAddress,
-		pingDeviceId: getIdFromPing(binaryAddress),
+		PingDeviceId: getIdFromPing(binaryAddress),
 	}
 
 }

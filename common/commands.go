@@ -32,7 +32,11 @@ var Commands = map[string]Command{
 	},
 	"ventilation_mode_supply_only_1h": {
 		Fragmentation: 0x1,
-		Code:          "8415060100000000100e000001",
+		Code:          "8415060100000000100E000001",
+	},
+	"ventilation_mode_outlet_only_1h": {
+		Fragmentation: 0x1,
+		Code:          "8415070100000000100E000001", //
 	},
 	"ventilation_mode_balanced": {
 		Fragmentation: 0x0,

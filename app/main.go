@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 	"encoding/json"
+	"strconv"
+	"fmt"
 )
 
 func runApiServer(s *serial.Port, w *can.CanBusWriter) {
@@ -31,13 +33,17 @@ func readSerial(s *serial.Port) <-chan can.CanBusFrame {
 	return out
 }
 
-func process(in <-chan can.CanBusFrame) <-chan common.Measurement {
+func process(in <-chan can.CanBusFrame, stateDao dao.StateDao) <-chan common.Measurement {
 	out := make(chan common.Measurement)
 	go func() {
 		for b := range in {
-
-			//log.Println(b)
-			out <- common.ToMeasurement(b)
+			if b.PingDeviceId != 0 {
+				id,_ := strconv.Atoi(fmt.Sprintf("%02x",b.PingDeviceId))
+				log.Println("storing comfoAir id: ", id)
+				stateDao.Set(can.ComfoAirId, id)
+			} else {
+				out <- common.ToMeasurement(b)
+			}
 		}
 	}()
 	return out
@@ -89,10 +95,10 @@ func MainLoop() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	log.Println("reading messages")
-	lines := readSerial(s)
-	messages := process(lines)
-	sendMeasurement(messages, i, amqpClient, queue)
+	log.Println("reading measurements")
+	canBusFrames := readSerial(s)
+	measurements := process(canBusFrames, stateDao)
+	sendMeasurement(measurements, i, amqpClient, queue)
 
 	wg.Wait()
 }
