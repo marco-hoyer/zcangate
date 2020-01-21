@@ -38,9 +38,12 @@ func process(in <-chan can.CanBusFrame, stateDao dao.StateDao) <-chan common.Mea
 	go func() {
 		for b := range in {
 			if b.PingDeviceId != 0 {
-				id,_ := strconv.Atoi(fmt.Sprintf("%02x",b.PingDeviceId))
-				log.Println("storing comfoAir id: ", id)
-				stateDao.Set(can.ComfoAirId, id)
+				id, _ := strconv.Atoi(fmt.Sprintf("%02x", b.PingDeviceId))
+				persitedId := stateDao.GetInt(can.ComfoAirId)
+				if persitedId == 0 || id < persitedId {
+					log.Println("storing comfoAir id: ", id)
+					stateDao.Set(can.ComfoAirId, id)
+				}
 			} else {
 				out <- common.ToMeasurement(b)
 			}

@@ -9,7 +9,6 @@ import (
 type Type struct {
 	name, unit     string
 	transformation func(string) float64
-	logRawValue    bool
 }
 
 type Measurement struct {
@@ -27,7 +26,9 @@ func transformTemperature(s string) float64 {
 	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
 
 	value := float64(v1+v2*255) / float64(10)
-	log.Println("Transformed temperature Value '", s, "' into: ", value)
+	if value > 100 {
+		log.Println("Transformed temperature value: '", s, "' into: ", value)
+	}
 	return value
 }
 
@@ -268,7 +269,6 @@ var mapping = map[int]Type{
 		name:           "temperature_inlet_before_preheater",
 		unit:           "°C",
 		transformation: transformTemperature,
-		logRawValue:    true,
 	},
 	221: {
 		name:           "temperature_inlet_after_recuperator",
@@ -346,13 +346,11 @@ var mapping = map[int]Type{
 		name:           "temperature_inlet_before_preheater",
 		unit:           "°C",
 		transformation: transformTemperature,
-		logRawValue:    true,
 	},
 	277: {
 		name:           "temperature_inlet_before_recuperator",
 		unit:           "°C",
 		transformation: transformTemperature,
-		logRawValue:    true,
 	},
 	278: {
 		name:           "temperature_inlet_after_recuperator",
@@ -442,9 +440,6 @@ var mapping = map[int]Type{
 func ToMeasurement(frame can.CanBusFrame) Measurement {
 	dataType, found := mapping[frame.Pdu]
 	if found {
-		if dataType.logRawValue {
-			log.Printf("Message %s | rawValue: %s\r", dataType.name, frame.Data)
-		}
 		return Measurement{
 			Name:  dataType.name,
 			Unit:  dataType.unit,
