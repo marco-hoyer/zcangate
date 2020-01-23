@@ -38,12 +38,15 @@ func (w *CanBusWriter) WriteCommand(fragmentation int, data string) {
 	w.StateDao.Set(sequenceNumberStateKey, sequenceNumber)
 
 	comfoAirId := w.StateDao.GetInt(ComfoAirId)
+	if comfoAirId == 0 {
+		log.Println("Did not capture a heartbeat message from comfoair so far to gather it's bus ID. Please wait some seconds and retry.")
+	} else {
+		log.Println("sending command from id:", comfoAirId+1, "to hex id:", comfoAirId, " with sequence number: ", sequenceNumber)
 
-	log.Println("sending command to hex id:", comfoAirId, " with sequence number: ", sequenceNumber)
-
-	address := GenerateAddress(comfoAirId+1, comfoAirId, fragmentation, sequenceNumber)
-	log.Println("Generated address: ", address)
-	w.Write(address, data)
+		address := GenerateAddress(comfoAirId+1, comfoAirId, fragmentation, sequenceNumber)
+		log.Println("Generated address: ", address)
+		w.Write(address, data)
+	}
 }
 
 func (w *CanBusWriter) Write(id string, data string) {

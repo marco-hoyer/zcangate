@@ -1,9 +1,9 @@
 package common
 
 import (
+	"github.com/marco-hoyer/zcangate/can"
 	"log"
 	"strconv"
-	"github.com/marco-hoyer/zcangate/can"
 )
 
 type Type struct {
@@ -21,11 +21,17 @@ func transformSmallNumber(s string) float64 {
 	return float64(v)
 }
 
-func transformTemperature(s string) float64 {
+func TransformTemperature(s string) float64 {
 	v1, _ := strconv.ParseInt(s[0:2], 16, 64)
 	v2, _ := strconv.ParseInt(s[2:4], 16, 64)
 
-	value := float64(v1+v2*255) / float64(10)
+	value := float64(0)
+
+	if v2 == 255 {
+		value = float64(v1+(-1*255)) / float64(10)
+	} else {
+		value = float64(v1+v2*255) / float64(10)
+	}
 	if value > 100 {
 		log.Println("Transformed temperature value: '", s, "' into: ", value)
 	}
@@ -213,7 +219,7 @@ var mapping = map[int]Type{
 	209: {
 		name:           "RMOT",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	210: {
 		name:           "z_Unknown_TempHumConf",
@@ -228,7 +234,7 @@ var mapping = map[int]Type{
 	212: {
 		name:           "Target_temperature",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	213: {
 		name:           "Power_avoided_heating_actual",
@@ -268,12 +274,12 @@ var mapping = map[int]Type{
 	220: {
 		name:           "temperature_inlet_before_preheater",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	221: {
 		name:           "temperature_inlet_after_recuperator",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	222: {
 		name:           "z_Unknown_TempHumConf",
@@ -330,32 +336,32 @@ var mapping = map[int]Type{
 	273: {
 		name:           "temperature_something...",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	274: {
 		name:           "temperature_outlet_before_recuperator",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	275: {
 		name:           "temperature_outlet_after_recuperator",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	276: {
 		name:           "temperature_inlet_before_preheater",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	277: {
 		name:           "temperature_inlet_before_recuperator",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 	278: {
 		name:           "temperature_inlet_after_recuperator",
 		unit:           "°C",
-		transformation: transformTemperature,
+		transformation: TransformTemperature,
 	},
 
 	289: {
@@ -446,7 +452,7 @@ func ToMeasurement(frame can.CanBusFrame) Measurement {
 			Value: dataType.transformation(frame.Data),
 		}
 	} else {
-		log.Printf("Unknown message: %s | %d | %s\r", frame.Id, frame.Length, frame.Data)
+		log.Printf("Unknown message found with id: %s, pdu: %d, data: %s\r", frame.Id, frame.Pdu, frame.Data)
 		return Measurement{}
 	}
 
