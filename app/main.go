@@ -1,18 +1,18 @@
 package app
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/marco-hoyer/zcangate/api"
 	"github.com/marco-hoyer/zcangate/can"
-	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/marco-hoyer/zcangate/common"
-	"github.com/tarm/serial"
+	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/streadway/amqp"
+	"github.com/tarm/serial"
 	"log"
+	"strconv"
 	"sync"
 	"time"
-	"encoding/json"
-	"strconv"
-	"fmt"
 )
 
 func runApiServer(s *serial.Port, w *can.CanBusWriter) {
@@ -41,7 +41,6 @@ func process(in <-chan can.CanBusFrame, stateDao dao.StateDao) <-chan common.Mea
 				id, _ := strconv.Atoi(fmt.Sprintf("%02x", b.PingDeviceId))
 				persitedId := stateDao.GetInt(can.ComfoAirId)
 				if persitedId == 0 || id < persitedId {
-					log.Println("storing comfoAir id: ", id)
 					stateDao.Set(can.ComfoAirId, id)
 				}
 			} else {
