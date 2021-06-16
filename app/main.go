@@ -1,13 +1,11 @@
 package app
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/marco-hoyer/zcangate/api"
 	"github.com/marco-hoyer/zcangate/can"
 	"github.com/marco-hoyer/zcangate/common"
 	"github.com/marco-hoyer/zcangate/dao"
-	"github.com/streadway/amqp"
 	"github.com/tarm/serial"
 	"log"
 	"strconv"
@@ -51,13 +49,11 @@ func process(in <-chan can.CanBusFrame, stateDao dao.StateDao) <-chan common.Mea
 	return out
 }
 
-func sendMeasurement(in <-chan common.Measurement, i Influxdb, m AmqpClient, q amqp.Queue) {
+func sendMeasurement(in <-chan common.Measurement, i Influxdb) {
 	go func() {
 		for b := range in {
 			if b.Name != "" {
 				i.Send(b.Name, "Haus", b.Unit, "1", b.Value)
-				jsonBytes, _ := json.Marshal(b)
-				m.Publish(q, jsonBytes)
 			}
 		}
 	}()
@@ -78,12 +74,6 @@ func MainLoop() {
 	i.Connect()
 	defer i.Disconnect()
 
-	log.Println("Connecting to RabbitMq Server")
-	amqpClient := AmqpClient{}
-	amqpClient.Connect()
-	queue := amqpClient.QueueDeclare("ventilation/measurements")
-	defer amqpClient.Disconnect()
-
 	w := can.CanBusWriter{Serial: s, StateDao: stateDao}
 
 	log.Println("Starting webserver")
@@ -100,7 +90,7 @@ func MainLoop() {
 	log.Println("reading measurements")
 	canBusFrames := readSerial(s)
 	measurements := process(canBusFrames, stateDao)
-	sendMeasurement(measurements, i, amqpClient, queue)
+	sendMeasurement(measurements, i)
 
 	wg.Wait()
 }
