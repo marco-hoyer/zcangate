@@ -1,13 +1,13 @@
 package api
 
 import (
+	"encoding/json"
+	"github.com/gorilla/mux"
 	"github.com/marco-hoyer/zcangate/can"
 	"github.com/marco-hoyer/zcangate/common"
-	"github.com/gorilla/mux"
 	"github.com/tarm/serial"
 	"log"
 	"net/http"
-	"encoding/json"
 )
 
 type WebServer struct {
@@ -36,7 +36,7 @@ func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 
 	if found {
 		log.Println("executing command: ", commandQueryParam)
-		s.CanBusWriter.WriteCommand(command.Fragmentation, command.Code)
+		s.CanBusWriter.WriteCommand(command)
 		w.Write([]byte("OK"))
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
