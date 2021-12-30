@@ -2,20 +2,14 @@ package can
 
 import (
 	"fmt"
-	"github.com/marco-hoyer/zcangate/common"
-	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/tarm/serial"
 	"log"
 	"strings"
 	"time"
 )
 
-const sequenceNumberStateKey = "canCommandSequenceNumber"
-const ComfoAirId = "canComfoAirId"
-
-type CanBusWriter struct {
-	Serial   *serial.Port
-	StateDao dao.StateDao
+type BusWriter struct {
+	Serial *serial.Port
 }
 
 func GenerateAddress(source int, destination int, fragmentation int, sequenceNumber int) string {
@@ -41,12 +35,12 @@ func GenerateAddress(source int, destination int, fragmentation int, sequenceNum
 	return fmt.Sprintf("%X", addr)
 }
 
-func (w *CanBusWriter) WriteCommand(command common.Command) {
+func (w *BusWriter) WriteCommand(command Command) {
 	frames := CommandToFrames(command)
 	w.Send(frames)
 }
 
-func CommandToFrames(command common.Command) []string {
+func CommandToFrames(command Command) []string {
 	data := command.Code
 	address := GenerateAddress(5, 1, command.Fragmentation, 1)
 	length := len(data) / 2
@@ -81,13 +75,13 @@ func CommandToFrames(command common.Command) []string {
 	return result
 }
 
-func (w *CanBusWriter) Send(frames []string) {
+func (w *BusWriter) Send(frames []string) {
 	for _, frame := range frames {
 		w.writeAndWait(frame)
 	}
 }
 
-func (w *CanBusWriter) Write(id string, data string) {
+func (w *BusWriter) Write(id string, data string) {
 	length := len(data) / 2
 	log.Println("Length", length)
 	if length > 8 {
@@ -117,7 +111,7 @@ func (w *CanBusWriter) Write(id string, data string) {
 	}
 }
 
-func (w *CanBusWriter) writeAndWait(payload string) {
+func (w *BusWriter) writeAndWait(payload string) {
 	fmt.Println("command string: ", payload)
 	fmt.Println("command ascii: ", []byte(payload))
 
@@ -125,7 +119,7 @@ func (w *CanBusWriter) writeAndWait(payload string) {
 	time.Sleep(500 * time.Millisecond)
 }
 
-func (w *CanBusWriter) writeAndWait2(payload string) {
+func (w *BusWriter) writeAndWait2(payload string) {
 	fmt.Println("command string: ", payload)
 	fmt.Println("command ascii: ", []byte(payload))
 

@@ -9,16 +9,16 @@ import (
 	"strings"
 )
 
-type CanBusReader struct {
+type BusReader struct {
 	interfaceReader io.Reader
-	output          chan CanBusFrame
+	output          chan BusFrame
 }
 
-func NewCanBusReader(reader io.Reader, output chan CanBusFrame) *CanBusReader {
-	return &CanBusReader{interfaceReader: reader, output: output}
+func NewCanBusReader(reader io.Reader, output chan BusFrame) *BusReader {
+	return &BusReader{interfaceReader: reader, output: output}
 }
 
-func (c *CanBusReader) Read() {
+func (c *BusReader) Read() {
 	go func() {
 		reader := bufio.NewReader(c.interfaceReader)
 
@@ -41,7 +41,7 @@ func (c *CanBusReader) Read() {
 	}()
 }
 
-type CanBusFrame struct {
+type BusFrame struct {
 	Id           string
 	BinaryId     uint64
 	Pdu          int
@@ -51,7 +51,7 @@ type CanBusFrame struct {
 	PingDeviceId uint64
 }
 
-func (f CanBusFrame) toBytes() []byte {
+func (f BusFrame) toBytes() []byte {
 	return []byte("")
 }
 
@@ -86,7 +86,7 @@ func getIdFromPing(binaryId uint64) uint64 {
 	}
 }
 
-func toCanBusFrame(line string) CanBusFrame {
+func toCanBusFrame(line string) BusFrame {
 	address := line[1:9]
 	binaryAddress, _ := strconv.ParseUint(address, 16, 32)
 
@@ -98,7 +98,7 @@ func toCanBusFrame(line string) CanBusFrame {
 		cn1fAddress = CN1FAddressFromBinaryAddress(binaryAddress)
 	}
 
-	return CanBusFrame{
+	return BusFrame{
 		Id:           address,
 		BinaryId:     binaryAddress,
 		Pdu:          pdu,

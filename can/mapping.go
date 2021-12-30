@@ -1,7 +1,6 @@
-package common
+package can
 
 import (
-	"github.com/marco-hoyer/zcangate/can"
 	"log"
 	"strconv"
 )
@@ -443,7 +442,7 @@ var mapping = map[int]Type{
 	},
 }
 
-func ToMeasurement(frame can.CanBusFrame) Measurement {
+func ToMeasurement(frame BusFrame) Measurement {
 	dataType, found := mapping[frame.Pdu]
 	if found {
 		return Measurement{

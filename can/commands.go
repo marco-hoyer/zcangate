@@ -1,4 +1,4 @@
-package common
+package can
 
 type Command struct {
 	Fragmentation int

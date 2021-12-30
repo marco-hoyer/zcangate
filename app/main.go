@@ -1,96 +1,88 @@
 package app
 
 import (
-	"fmt"
 	"github.com/marco-hoyer/zcangate/api"
 	"github.com/marco-hoyer/zcangate/can"
-	"github.com/marco-hoyer/zcangate/common"
 	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/tarm/serial"
 	"log"
-	"strconv"
 	"sync"
 	"time"
 )
 
-func runApiServer(s *serial.Port, w *can.CanBusWriter) {
+func runApiServer(serialPort *serial.Port, canBusWriter *can.BusWriter, state *dao.StateDao) {
 	go func() {
 		s := api.WebServer{
-			s,
-			w,
+			SerialInterface: serialPort,
+			CanBusWriter:    canBusWriter,
+			State:           state,
 		}
 		s.Run()
 	}()
 }
 
-func readSerial(s *serial.Port) <-chan can.CanBusFrame {
-	out := make(chan can.CanBusFrame)
+func readSerial(s *serial.Port) <-chan can.BusFrame {
+	out := make(chan can.BusFrame)
 	go func() {
 		can.NewCanBusReader(s, out).Read()
 	}()
 	return out
 }
 
-func process(in <-chan can.CanBusFrame, stateDao dao.StateDao) <-chan common.Measurement {
-	out := make(chan common.Measurement)
+func process(in <-chan can.BusFrame) <-chan can.Measurement {
+	out := make(chan can.Measurement)
 	go func() {
 		for b := range in {
-			if b.PingDeviceId != 0 {
-				id, _ := strconv.Atoi(fmt.Sprintf("%02x", b.PingDeviceId))
-				persitedId := stateDao.GetInt(can.ComfoAirId)
-				if persitedId == 0 || id < persitedId {
-					stateDao.Set(can.ComfoAirId, id)
-				}
-			} else {
-				out <- common.ToMeasurement(b)
-			}
+			out <- can.ToMeasurement(b)
 		}
 	}()
+
 	return out
 }
 
-func sendMeasurement(in <-chan common.Measurement, i Influxdb) {
+func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *dao.StateDao) {
 	go func() {
 		for b := range in {
 			if b.Name != "" {
-				i.Send(b.Name, "Haus", b.Unit, "1", b.Value)
+				influxdb.Send(b.Name, "Haus", b.Unit, "1", b.Value)
+				state.Set(b.Name, b.Value)
 			}
 		}
 	}()
 }
 
 func MainLoop() {
-	c := &serial.Config{Name: "/tmp/ttyACM0", Baud: 115200, ReadTimeout: time.Second * 5}
-	s, err := serial.OpenPort(c)
+	portConfig := &serial.Config{Name: "/tmp/ttyACM0", Baud: 115200, ReadTimeout: time.Second * 5}
+	serial, err := serial.OpenPort(portConfig)
 	if err != nil {
 		log.Fatal(err)
 		panic(1)
 	}
 
-	stateDao := dao.NewStateDao()
-
 	log.Println("Connecting to influxdb")
-	i := Influxdb{}
-	i.Connect()
-	defer i.Disconnect()
+	influxdb := Influxdb{}
+	influxdb.Connect()
+	defer influxdb.Disconnect()
 
-	w := can.CanBusWriter{Serial: s, StateDao: stateDao}
+	state := dao.NewStateDao()
+
+	busWriter := can.BusWriter{Serial: serial}
 
 	log.Println("Starting webserver")
-	runApiServer(s, &w)
+	runApiServer(serial, &busWriter, &state)
 
 	log.Println("opening CAN interface connection")
 	// set CAN bus baud rate and open reading connection
-	s.Write([]byte("\r\r\rC\rS2\rO\r"))
-	defer s.Write([]byte("C\r"))
+	serial.Write([]byte("\r\r\rC\rS2\rO\r"))
+	defer serial.Write([]byte("C\r"))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	log.Println("reading measurements")
-	canBusFrames := readSerial(s)
-	measurements := process(canBusFrames, stateDao)
-	sendMeasurement(measurements, i)
+	canBusFrames := readSerial(serial)
+	measurements := process(canBusFrames)
+	processMeasurements(measurements, influxdb, &state)
 
 	wg.Wait()
 }
