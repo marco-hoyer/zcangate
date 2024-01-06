@@ -32,3 +32,25 @@ func TestTransformTemperatureForPositiveValue(t *testing.T) {
 		t.Errorf("TransformTemperature('0201') = %.2f; want 25.7", result)
 	}
 }
+
+func TestToPdo(t *testing.T) {
+	input := uint64(0x00454041)
+	result := can.ToPdo(input, 1)
+	if result != 277 {
+		t.Errorf("00454041 should be transformed to 277 but was %d", result)
+	}
+
+	input = uint64(0x00458041)
+	result = can.ToPdo(input, 1)
+	if result != 278 {
+		t.Errorf("00454041 should be transformed to 278 but was %d", result)
+	}
+}
+
+func TestFromPdo(t *testing.T) {
+	input := uint64(0x1)
+	result := can.FromPdo(input, 1)
+	if result != 1654849 {
+		t.Errorf("00454041 should be transformed to 1654849 but was %d", result)
+	}
+}

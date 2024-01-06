@@ -16,19 +16,19 @@ var Commands = map[string]Command{
 	},
 	"ventilation_level_3": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF03",
+		Code:          "84150101000000000100000003",
 	},
 	"ventilation_level_2": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF02",
+		Code:          "84150101000000000100000002",
 	},
 	"ventilation_level_1": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF01",
+		Code:          "84150101000000000100000001",
 	},
 	"ventilation_level_0": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF00",
+		Code:          "84150101000000000100000000",
 	},
 	"ventilation_mode_supply_only_1h": {
 		Fragmentation: 0x1,

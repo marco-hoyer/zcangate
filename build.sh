@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-VERSION=32
+VERSION=33
 
 docker login
 
