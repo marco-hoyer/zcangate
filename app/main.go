@@ -40,12 +40,37 @@ func process(in <-chan can.BusFrame) <-chan can.Measurement {
 	return out
 }
 
-func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *dao.StateDao) {
+func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *dao.StateDao) <-chan interface{} {
+	heartbeatStream := make(chan interface{}, 1)
+
+	sendHeartBeat := func() {
+		select {
+		case heartbeatStream <- struct{}{}:
+		default:
+		}
+	}
+
 	go func() {
 		for b := range in {
 			if b.Name != "" {
 				influxdb.Send(b.Name, "Haus", b.Unit, "1", b.Value)
 				state.Set(b.Name, b.Value)
+				sendHeartBeat()
+			}
+		}
+	}()
+
+	return heartbeatStream
+}
+
+func checkHeartbeat(heartbeat <-chan interface{}) {
+	go func() {
+		for {
+			select {
+			case _ = <-heartbeat:
+				continue
+			case <-time.After(60 * time.Second):
+				log.Fatal("Process didn't receive data after 60 seconds")
 			}
 		}
 	}()
@@ -53,11 +78,12 @@ func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *da
 
 func MainLoop() {
 	portConfig := &serial.Config{Name: "/tmp/ttyACM0", Baud: 115200, ReadTimeout: time.Second * 5}
-	serial, err := serial.OpenPort(portConfig)
+	serialPort, err := serial.OpenPort(portConfig)
 	if err != nil {
 		log.Fatal(err)
-		panic(1)
 	}
+
+	defer serialPort.Close()
 
 	log.Println("Connecting to influxdb")
 	influxdb := Influxdb{}
@@ -65,24 +91,24 @@ func MainLoop() {
 	defer influxdb.Disconnect()
 
 	state := dao.NewStateDao()
-
-	busWriter := can.BusWriter{Serial: serial}
+	busWriter := can.BusWriter{Serial: serialPort}
 
 	log.Println("Starting webserver")
-	runApiServer(serial, &busWriter, &state)
+	runApiServer(serialPort, &busWriter, &state)
 
 	log.Println("opening CAN interface connection")
 	// set CAN bus baud rate and open reading connection
-	serial.Write([]byte("\r\r\rC\rS2\rO\r"))
-	defer serial.Write([]byte("C\r"))
+	serialPort.Write([]byte("\r\r\rC\rS2\rO\r"))
+	defer serialPort.Write([]byte("C\r"))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	log.Println("reading measurements")
-	canBusFrames := readSerial(serial)
+	canBusFrames := readSerial(serialPort)
 	measurements := process(canBusFrames)
-	processMeasurements(measurements, influxdb, &state)
+	heartbeat := processMeasurements(measurements, influxdb, &state)
+	checkHeartbeat(heartbeat)
 
 	wg.Wait()
 }
