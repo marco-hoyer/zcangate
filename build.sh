@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+set -e
 
-VERSION=24
+VERSION=42
 
 docker login
 

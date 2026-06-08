@@ -1,4 +1,4 @@
-package common
+package can
 
 type Command struct {
 	Fragmentation int
@@ -12,23 +12,23 @@ var Commands = map[string]Command{
 	},
 	"manual_mode": {
 		Fragmentation: 0x1,
-		Code:          "84150801000000000100000001",
+		Code:          "8415080100000000ffffffff01",
 	},
 	"ventilation_level_3": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF03",
+		Code:          "8415010100000000ffffffff03",
 	},
 	"ventilation_level_2": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF02",
+		Code:          "8415010100000000ffffffff02",
 	},
 	"ventilation_level_1": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF01",
+		Code:          "8415010100000000ffffffff01",
 	},
 	"ventilation_level_0": {
 		Fragmentation: 0x1,
-		Code:          "8415010100000000FFFFFFFF00",
+		Code:          "8415010100000000ffffffff00",
 	},
 	"ventilation_mode_supply_only_1h": {
 		Fragmentation: 0x1,

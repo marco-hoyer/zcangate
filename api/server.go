@@ -1,52 +1,76 @@
 package api
 
 import (
-	"github.com/marco-hoyer/zcangate/can"
-	"github.com/marco-hoyer/zcangate/common"
+	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/marco-hoyer/zcangate/can"
+	"github.com/marco-hoyer/zcangate/dao"
 	"github.com/tarm/serial"
 	"log"
 	"net/http"
-	"encoding/json"
 )
 
 type WebServer struct {
 	SerialInterface *serial.Port
-	CanBusWriter    *can.CanBusWriter
+	CanBusWriter    *can.BusWriter
+	State           *dao.StateDao
 }
 
-func commandsIndexHandler(w http.ResponseWriter, r *http.Request) {
-	commands := make([]string, len(common.Commands))
+type MeasurementResponse struct {
+	Value float64
+}
+
+func commandsIndexHandler(w http.ResponseWriter, _ *http.Request) {
+	commands := make([]string, len(can.Commands))
 
 	i := 0
-	for k := range common.Commands {
+	for k := range can.Commands {
 		commands[i] = k
 		i++
 	}
 
 	enc := json.NewEncoder(w)
-	enc.Encode(commands)
+	_ = enc.Encode(commands)
 }
 
 func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	commandQueryParam := vars["command"]
 	log.Println("command query param ", commandQueryParam)
-	command, found := common.Commands[commandQueryParam]
+	command, found := can.Commands[commandQueryParam]
 
 	if found {
 		log.Println("executing command: ", commandQueryParam)
-		s.CanBusWriter.WriteCommand(command.Fragmentation, command.Code)
-		w.Write([]byte("OK"))
+		s.CanBusWriter.WriteCommand(command)
+		_, _ = w.Write([]byte("OK"))
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("ERROR, command not found"))
+		_, _ = w.Write([]byte("ERROR, command not found"))
 	}
+}
+
+func (s *WebServer) measurementsIndexHandler(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write([]byte(s.State.GetJson()))
+}
+
+func (s *WebServer) measurementHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	measurementName := vars["measurement"]
+	log.Println("requested measurement ", measurementName)
+
+	value := s.State.GetFloat64(measurementName)
+	log.Println("value from cache:", value)
+
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(MeasurementResponse{value})
 }
 
 func (s *WebServer) Run() {
 	router := mux.NewRouter()
+	router.HandleFunc("/measurements", s.measurementsIndexHandler)
+	router.HandleFunc("/measurements/{measurement}", s.measurementHandler)
 	router.HandleFunc("/commands", commandsIndexHandler)
 	router.HandleFunc("/commands/{command}", s.commandHandler)
-	http.ListenAndServe(":8080", router)
+	_ = http.ListenAndServe(":8080", router)
 }

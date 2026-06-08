@@ -9,16 +9,18 @@ import (
 	"strings"
 )
 
-type CanBusReader struct {
+var debugMode = os.Getenv("DEBUG_CAN") != ""
+
+type BusReader struct {
 	interfaceReader io.Reader
-	output          chan CanBusFrame
+	output          chan BusFrame
 }
 
-func NewCanBusReader(reader io.Reader, output chan CanBusFrame) *CanBusReader {
-	return &CanBusReader{interfaceReader: reader, output: output}
+func NewCanBusReader(reader io.Reader, output chan BusFrame) *BusReader {
+	return &BusReader{interfaceReader: reader, output: output}
 }
 
-func (c *CanBusReader) Read() {
+func (c *BusReader) Read() {
 	go func() {
 		reader := bufio.NewReader(c.interfaceReader)
 
@@ -33,25 +35,35 @@ func (c *CanBusReader) Read() {
 				}
 			}
 
-			//fmt.Println(line)
+			trimmed := strings.Trim(line, "\r")
 			if strings.HasPrefix(line, "T") {
-				c.output <- toCanBusFrame(strings.Trim(line, "\r"))
+				frame := toCanBusFrame(trimmed)
+				if debugMode {
+					fmt.Printf("rx: id=%s src=%d dst=%d pdu=%d data=%s\n",
+						frame.Id,
+						frame.BinaryId&0x3f,
+						(frame.BinaryId>>6)&0x3f,
+						frame.Pdu,
+						frame.Data)
+				}
+				c.output <- frame
+			} else if trimmed != "" && trimmed != "Z" && trimmed != "z" {
+				fmt.Printf("rx: %q\n", trimmed)
 			}
 		}
 	}()
 }
 
-type CanBusFrame struct {
-	Id           string
-	BinaryId     uint64
-	Pdu          int
-	Length       int
-	Data         string
-	CN1FAddress  CN1FAddress
-	PingDeviceId uint64
+type BusFrame struct {
+	Id          string
+	BinaryId    uint64
+	Pdu         int
+	Length      int
+	Data        string
+	CN1FAddress CN1FAddress
 }
 
-func (f CanBusFrame) toBytes() []byte {
+func (f BusFrame) toBytes() []byte {
 	return []byte("")
 }
 
@@ -60,8 +72,8 @@ type CN1FAddress struct {
 	dst            uint64
 	unknownCounter uint64
 	multiMessage   uint64
-	A8000          uint64
-	A10000         uint64
+	errorOccured   uint64
+	isRequest      uint64
 	SequenceNumber uint64
 }
 
@@ -71,22 +83,13 @@ func CN1FAddressFromBinaryAddress(a uint64) CN1FAddress {
 		dst:            (a >> 6) & 0x3f,
 		unknownCounter: (a >> 12) & 0x03,
 		multiMessage:   (a >> 14) & 0x01,
-		A8000:          (a >> 15) & 0x01,
-		A10000:         (a >> 16) & 0x01,
+		errorOccured:   (a >> 15) & 0x01,
+		isRequest:      (a >> 16) & 0x01,
 		SequenceNumber: (a >> 17) & 0x03,
 	}
 }
 
-func getIdFromPing(binaryId uint64) uint64 {
-	// address 1000000x indicates a heartbeat from a CAN bus device with Id x
-	if binaryId&0xFFFFFFC0 == 0x10000000 {
-		return uint64(binaryId & 0x3f)
-	} else {
-		return 0
-	}
-}
-
-func toCanBusFrame(line string) CanBusFrame {
+func toCanBusFrame(line string) BusFrame {
 	address := line[1:9]
 	binaryAddress, _ := strconv.ParseUint(address, 16, 32)
 
@@ -98,14 +101,13 @@ func toCanBusFrame(line string) CanBusFrame {
 		cn1fAddress = CN1FAddressFromBinaryAddress(binaryAddress)
 	}
 
-	return CanBusFrame{
-		Id:           address,
-		BinaryId:     binaryAddress,
-		Pdu:          pdu,
-		Length:       int(length),
-		Data:         line[10:],
-		CN1FAddress:  cn1fAddress,
-		PingDeviceId: getIdFromPing(binaryAddress),
+	return BusFrame{
+		Id:          address,
+		BinaryId:    binaryAddress,
+		Pdu:         pdu,
+		Length:      int(length),
+		Data:        line[10:],
+		CN1FAddress: cn1fAddress,
 	}
 
 }

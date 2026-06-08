@@ -1,7 +1,6 @@
-package common
+package can
 
 import (
-	"github.com/marco-hoyer/zcangate/can"
 	"log"
 	"strconv"
 )
@@ -14,6 +13,14 @@ type Type struct {
 type Measurement struct {
 	Name, Unit string
 	Value      float64
+}
+
+func FromPdo(pdoId uint64, nodeId uint64) uint64 {
+	return (pdoId << 14) + 0x40 + nodeId
+}
+
+func ToPdo(canId uint64, nodeId uint64) uint64 {
+	return (canId - 0x40 - nodeId) >> 14
 }
 
 func transformSmallNumber(s string) float64 {
@@ -54,9 +61,9 @@ func transformAny(s string) float64 {
 
 var mapping = map[int]Type{
 	16: {
-		name:           "z_unknown_NwoNode",
+		name:           "away_mode",
 		unit:           "",
-		transformation: transformAny,
+		transformation: transformSmallNumber,
 	},
 	17: {
 		name:           "z_unknown_NwoNode",
@@ -78,13 +85,23 @@ var mapping = map[int]Type{
 		unit:           "0=auto,1=open,2=close",
 		transformation: transformSmallNumber,
 	},
+	70: {
+		name:           "fan_mode_supply",
+		unit:           "",
+		transformation: transformSmallNumber,
+	},
+	71: {
+		name:           "fan_mode_exhaust",
+		unit:           "",
+		transformation: transformSmallNumber,
+	},
 	81: {
-		name:           "Timer1",
+		name:           "fan_next_change",
 		unit:           "s",
 		transformation: transformAny,
 	},
 	82: {
-		name:           "Timer2",
+		name:           "bypass_next_change",
 		unit:           "s",
 		transformation: transformAny,
 	},
@@ -222,14 +239,14 @@ var mapping = map[int]Type{
 		transformation: TransformTemperature,
 	},
 	210: {
-		name:           "z_Unknown_TempHumConf",
+		name:           "heating_season",
 		unit:           "",
-		transformation: transformAny,
+		transformation: transformSmallNumber,
 	},
 	211: {
-		name:           "z_Unknown_TempHumConf",
+		name:           "cooling_season",
 		unit:           "",
-		transformation: transformAny,
+		transformation: transformSmallNumber,
 	},
 	212: {
 		name:           "Target_temperature",
@@ -292,9 +309,9 @@ var mapping = map[int]Type{
 		transformation: transformAny,
 	},
 	225: {
-		name:           "z_Unknown_VentConf",
+		name:           "comfocontrol_mode",
 		unit:           "",
-		transformation: transformAny,
+		transformation: transformSmallNumber,
 	},
 	226: {
 		name:           "z_Unknown_VentConf",
@@ -443,7 +460,7 @@ var mapping = map[int]Type{
 	},
 }
 
-func ToMeasurement(frame can.CanBusFrame) Measurement {
+func ToMeasurement(frame BusFrame) Measurement {
 	dataType, found := mapping[frame.Pdu]
 	if found {
 		return Measurement{
@@ -452,7 +469,7 @@ func ToMeasurement(frame can.CanBusFrame) Measurement {
 			Value: dataType.transformation(frame.Data),
 		}
 	} else {
-		log.Printf("Unknown message found with id: %s, pdu: %d, data: %s\r", frame.Id, frame.Pdu, frame.Data)
+		//log.Printf("Unknown message found with id: %s, pdu: %d, data: %s\r", frame.Id, frame.Pdu, frame.Data)
 		return Measurement{}
 	}
 
