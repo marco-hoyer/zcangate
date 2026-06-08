@@ -12,23 +12,23 @@ var Commands = map[string]Command{
 	},
 	"manual_mode": {
 		Fragmentation: 0x1,
-		Code:          "84150801000000000100000001",
+		Code:          "8415080100000000ffffffff01",
 	},
 	"ventilation_level_3": {
 		Fragmentation: 0x1,
-		Code:          "84150101000000000100000003",
+		Code:          "8415010100000000ffffffff03",
 	},
 	"ventilation_level_2": {
 		Fragmentation: 0x1,
-		Code:          "84150101000000000100000002",
+		Code:          "8415010100000000ffffffff02",
 	},
 	"ventilation_level_1": {
 		Fragmentation: 0x1,
-		Code:          "84150101000000000100000001",
+		Code:          "8415010100000000ffffffff01",
 	},
 	"ventilation_level_0": {
 		Fragmentation: 0x1,
-		Code:          "84150101000000000100000000",
+		Code:          "8415010100000000ffffffff00",
 	},
 	"ventilation_mode_supply_only_1h": {
 		Fragmentation: 0x1,
