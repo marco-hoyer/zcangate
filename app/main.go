@@ -12,12 +12,12 @@ import (
 
 func runApiServer(serialPort *serial.Port, canBusWriter *can.BusWriter, state *dao.StateDao) {
 	go func() {
-		s := api.WebServer{
+		server := api.WebServer{
 			SerialInterface: serialPort,
 			CanBusWriter:    canBusWriter,
 			State:           state,
 		}
-		s.Run()
+		server.Run()
 	}()
 }
 
@@ -29,14 +29,17 @@ func readSerial(s *serial.Port) <-chan can.BusFrame {
 	return out
 }
 
-func process(in <-chan can.BusFrame) <-chan can.Measurement {
+func process(in <-chan can.BusFrame, busWriter *can.BusWriter) <-chan can.Measurement {
 	out := make(chan can.Measurement)
 	go func() {
 		for b := range in {
-			out <- can.ToMeasurement(b)
+			if b.BinaryId&0xFFFFFFC0 == 0x10000000 {
+				busWriter.SetDeviceID(int(b.BinaryId & 0x3f))
+			} else {
+				out <- can.ToMeasurement(b)
+			}
 		}
 	}()
-
 	return out
 }
 
@@ -65,11 +68,15 @@ func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *da
 
 func checkHeartbeat(heartbeat <-chan interface{}) {
 	go func() {
+		timer := time.NewTimer(60 * time.Second)
 		for {
 			select {
-			case _ = <-heartbeat:
-				continue
-			case <-time.After(60 * time.Second):
+			case <-heartbeat:
+				if !timer.Stop() {
+					<-timer.C
+				}
+				timer.Reset(60 * time.Second)
+			case <-timer.C:
 				log.Fatal("Process didn't receive data after 60 seconds")
 			}
 		}
@@ -106,7 +113,7 @@ func MainLoop() {
 
 	log.Println("reading measurements")
 	canBusFrames := readSerial(serialPort)
-	measurements := process(canBusFrames)
+	measurements := process(canBusFrames, &busWriter)
 	heartbeat := processMeasurements(measurements, influxdb, &state)
 	checkHeartbeat(heartbeat)
 

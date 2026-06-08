@@ -50,9 +50,8 @@ func (s *WebServer) commandHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *WebServer) measurementsIndexHandler(w http.ResponseWriter, _ *http.Request) {
-	data := s.State.GetJson()
-	_, _ = w.Write([]byte(data))
 	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write([]byte(s.State.GetJson()))
 }
 
 func (s *WebServer) measurementHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,12 +60,10 @@ func (s *WebServer) measurementHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("requested measurement ", measurementName)
 
 	value := s.State.GetFloat64(measurementName)
-	log.Println("float32 value from cache:", value)
-	data := MeasurementResponse{value}
-	log.Println(data)
+	log.Println("value from cache:", value)
 
-	_ = json.NewEncoder(w).Encode(data)
 	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(MeasurementResponse{value})
 }
 
 func (s *WebServer) Run() {

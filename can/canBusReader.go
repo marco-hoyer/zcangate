@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var debugMode = os.Getenv("DEBUG_CAN") != ""
+
 type BusReader struct {
 	interfaceReader io.Reader
 	output          chan BusFrame
@@ -33,9 +35,20 @@ func (c *BusReader) Read() {
 				}
 			}
 
-			//fmt.Println(line)
+			trimmed := strings.Trim(line, "\r")
 			if strings.HasPrefix(line, "T") {
-				c.output <- toCanBusFrame(strings.Trim(line, "\r"))
+				frame := toCanBusFrame(trimmed)
+				if debugMode {
+					fmt.Printf("rx: id=%s src=%d dst=%d pdu=%d data=%s\n",
+						frame.Id,
+						frame.BinaryId&0x3f,
+						(frame.BinaryId>>6)&0x3f,
+						frame.Pdu,
+						frame.Data)
+				}
+				c.output <- frame
+			} else if trimmed != "" && trimmed != "Z" && trimmed != "z" {
+				fmt.Printf("rx: %q\n", trimmed)
 			}
 		}
 	}()

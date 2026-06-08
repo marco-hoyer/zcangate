@@ -32,7 +32,6 @@ func (s *StateDao) GetString(key string) string {
 func (s *StateDao) GetInt(key string) int {
 	s.mutex.RLock()
 	result := s.state.Get(key).Int(0)
-	s.state.Get(key).Float32()
 	s.mutex.RUnlock()
 	return result
 }
@@ -40,7 +39,6 @@ func (s *StateDao) GetInt(key string) int {
 func (s *StateDao) GetFloat64(key string) float64 {
 	s.mutex.RLock()
 	result := s.state.Get(key).Float64(0)
-
 	s.mutex.RUnlock()
 	return result
 }
@@ -48,13 +46,12 @@ func (s *StateDao) GetFloat64(key string) float64 {
 func (s *StateDao) Set(key string, value interface{}) {
 	s.mutex.Lock()
 	s.state.Set(key, value)
-
 	s.mutex.Unlock()
 }
 
 func (s *StateDao) GetJson() string {
-	s.mutex.Lock()
+	s.mutex.RLock()
 	result, _ := s.state.JSON()
-	s.mutex.Unlock()
+	s.mutex.RUnlock()
 	return result
 }
