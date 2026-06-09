@@ -468,10 +468,6 @@ func ToMeasurement(frame BusFrame) Measurement {
 			Unit:  dataType.unit,
 			Value: dataType.transformation(frame.Data),
 		}
-	} else {
-		//log.Printf("Unknown message found with id: %s, pdu: %d, data: %s\r", frame.Id, frame.Pdu, frame.Data)
-		return Measurement{}
 	}
-
 	return Measurement{}
 }

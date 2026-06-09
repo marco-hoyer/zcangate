@@ -10,12 +10,13 @@ import (
 	"time"
 )
 
-func runApiServer(serialPort *serial.Port, canBusWriter *can.BusWriter, state *dao.StateDao) {
+func runApiServer(canBusWriter *can.BusWriter, state *dao.StateDao, cfg Config) {
 	go func() {
 		server := api.WebServer{
-			SerialInterface: serialPort,
-			CanBusWriter:    canBusWriter,
-			State:           state,
+			CanBusWriter: canBusWriter,
+			State:        state,
+			Addr:         cfg.HTTPAddr,
+			AuthToken:    cfg.CommandAuthToken,
 		}
 		server.Run()
 	}()
@@ -56,7 +57,7 @@ func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *da
 	go func() {
 		for b := range in {
 			if b.Name != "" {
-				influxdb.Send(b.Name, "Haus", b.Unit, "1", b.Value)
+				influxdb.Send(b.Name, b.Unit, "1", b.Value)
 				state.Set(b.Name, b.Value)
 				sendHeartBeat()
 			}
@@ -66,45 +67,49 @@ func processMeasurements(in <-chan can.Measurement, influxdb Influxdb, state *da
 	return heartbeatStream
 }
 
-func checkHeartbeat(heartbeat <-chan interface{}) {
+func checkHeartbeat(heartbeat <-chan interface{}, timeout time.Duration) {
 	go func() {
-		timer := time.NewTimer(60 * time.Second)
+		timer := time.NewTimer(timeout)
 		for {
 			select {
 			case <-heartbeat:
 				if !timer.Stop() {
 					<-timer.C
 				}
-				timer.Reset(60 * time.Second)
+				timer.Reset(timeout)
 			case <-timer.C:
-				log.Fatal("Process didn't receive data after 60 seconds")
+				log.Fatalf("no measurement received within %s", timeout)
 			}
 		}
 	}()
 }
 
 func MainLoop() {
-	portConfig := &serial.Config{Name: "/tmp/ttyACM0", Baud: 115200, ReadTimeout: time.Second * 5}
+	cfg := LoadConfig()
+
+	portConfig := &serial.Config{
+		Name:        cfg.SerialPort,
+		Baud:        cfg.SerialBaud,
+		ReadTimeout: time.Second * 5,
+	}
 	serialPort, err := serial.OpenPort(portConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	defer serialPort.Close()
 
-	log.Println("Connecting to influxdb")
+	log.Println("connecting to InfluxDB")
 	influxdb := Influxdb{}
-	influxdb.Connect()
+	influxdb.Connect(cfg)
 	defer influxdb.Disconnect()
 
 	state := dao.NewStateDao()
 	busWriter := can.BusWriter{Serial: serialPort}
 
-	log.Println("Starting webserver")
-	runApiServer(serialPort, &busWriter, &state)
+	log.Println("starting web server on", cfg.HTTPAddr)
+	runApiServer(&busWriter, &state, cfg)
 
 	log.Println("opening CAN interface connection")
-	// set CAN bus baud rate and open reading connection
 	serialPort.Write([]byte("\r\r\rC\rS2\rO\r"))
 	defer serialPort.Write([]byte("C\r"))
 
@@ -115,7 +120,7 @@ func MainLoop() {
 	canBusFrames := readSerial(serialPort)
 	measurements := process(canBusFrames, &busWriter)
 	heartbeat := processMeasurements(measurements, influxdb, &state)
-	checkHeartbeat(heartbeat)
+	checkHeartbeat(heartbeat, cfg.HeartbeatTimeout)
 
 	wg.Wait()
 }

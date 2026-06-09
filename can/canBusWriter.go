@@ -16,8 +16,9 @@ type BusWriter struct {
 }
 
 func (w *BusWriter) SetDeviceID(id int) {
-	atomic.StoreInt32(&w.deviceNode, int32(id))
-	log.Printf("discovered CAN device node ID: %d", id)
+	if atomic.SwapInt32(&w.deviceNode, int32(id)) != int32(id) {
+		log.Printf("discovered CAN device node ID: %d", id)
+	}
 }
 
 func GenerateAddress(source int, destination int, fragmentation int, sequenceNumber int) string {
@@ -123,7 +124,7 @@ func (w *BusWriter) writeAndWait(payload string) {
 	n, err := w.Serial.Write([]byte(payload))
 	if err != nil {
 		log.Printf("serial write error: %v", err)
-	} else {
+	} else if debugMode {
 		log.Printf("serial write ok: %d bytes", n)
 	}
 	time.Sleep(500 * time.Millisecond)
