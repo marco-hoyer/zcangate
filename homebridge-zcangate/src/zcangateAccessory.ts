@@ -39,6 +39,7 @@ export class ZcangateAccessory implements AccessoryPlugin {
 
     this.fanService
       .getCharacteristic(this.api.hap.Characteristic.RotationSpeed)
+      .setProps({ minValue: 0, maxValue: 100, minStep: 100 / 3 })
       .onGet(this.getRotationSpeed.bind(this))
       .onSet(this.setRotationSpeed.bind(this));
 

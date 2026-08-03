@@ -4,8 +4,14 @@ import { ZcangateClient } from './zcangateClient';
 
 class FakeCharacteristic {
   value: unknown;
+  props: unknown;
   private getHandler?: () => Promise<unknown>;
   private setHandler?: (value: unknown) => Promise<void>;
+
+  setProps(props: unknown): this {
+    this.props = props;
+    return this;
+  }
 
   onGet(handler: () => Promise<unknown>): this {
     this.getHandler = handler;
@@ -142,6 +148,14 @@ describe('ZcangateAccessory', () => {
 
   it('exposes an AccessoryInformation and a Fanv2 service', () => {
     expect(accessory.getServices()).toHaveLength(2);
+  });
+
+  it('constrains RotationSpeed to snap at the 4 supported levels', () => {
+    expect(fanService.getCharacteristic(RotationSpeed).props).toEqual({
+      minValue: 0,
+      maxValue: 100,
+      minStep: 100 / 3,
+    });
   });
 
   it('turns the fan off by sending ventilation_level_0', async () => {
