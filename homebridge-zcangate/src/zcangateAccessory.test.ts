@@ -222,6 +222,31 @@ describe('ZcangateAccessory', () => {
     expect(fanService.getCharacteristic(CurrentFanState).value).toBe(CurrentFanState.BLOWING_AIR);
   });
 
+  it('reconciles TargetFanState to MANUAL from a poll when ventilation_control_mode is 1', async () => {
+    client.getMeasurements.mockResolvedValue({ ventilation_level: 2, ventilation_control_mode: 1 });
+
+    await accessory.poll();
+
+    expect(fanService.getCharacteristic(TargetFanState).value).toBe(TargetFanState.MANUAL);
+  });
+
+  it('reconciles TargetFanState to AUTO from a poll when ventilation_control_mode is 0', async () => {
+    client.getMeasurements.mockResolvedValue({ ventilation_level: 2, ventilation_control_mode: 0 });
+
+    await accessory.poll();
+
+    expect(fanService.getCharacteristic(TargetFanState).value).toBe(TargetFanState.AUTO);
+  });
+
+  it('leaves TargetFanState untouched when a poll omits ventilation_control_mode', async () => {
+    await fanService.getCharacteristic(TargetFanState).triggerSet(TargetFanState.AUTO);
+    client.getMeasurements.mockResolvedValue({ ventilation_level: 2 });
+
+    await accessory.poll();
+
+    expect(fanService.getCharacteristic(TargetFanState).value).toBe(TargetFanState.AUTO);
+  });
+
   it('logs and keeps the last known state when a poll fails', async () => {
     client.getMeasurements.mockResolvedValue({ ventilation_level: 2 });
     await accessory.poll();

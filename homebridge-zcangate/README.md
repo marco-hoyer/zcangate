@@ -45,13 +45,7 @@ Homebridge UI X, which reads `config.schema.json` to render a form):
 |---|---|
 | `Active` (on/off) | Off sends `ventilation_level_0`. On sends `ventilation_level_N` for the last remembered non-zero speed (default level 1). |
 | `RotationSpeed` (0–100%) | Quantized to the nearest of 4 buckets — 0/33/66/100 — mapped to `ventilation_level_0`.._3`. Changing speed while in Auto mode first switches to Manual. |
-| `TargetFanState` (Auto/Manual) | Sends the `auto_mode` / `manual_mode` commands. |
+| `TargetFanState` (Auto/Manual) | Sends the `auto_mode` / `manual_mode` commands. Reconciled from the polled `ventilation_control_mode` measurement (`0`=auto, `1`=manual — the inverse of HAP's `TargetFanState`). |
 | `CurrentFanState` (read-only) | Derived from the polled fan speed. |
 
-## Known limitation: Auto/Manual isn't read back from the device
-
-zcangate has no confirmed measurement field reporting whether the unit is
-currently in automatic or manual mode. This plugin therefore **caches the
-Auto/Manual state locally** — it reflects the last mode set through this
-plugin, not necessarily the device's true current mode if changed by another
-controller (e.g. the physical remote).
+Because zcangate passively listens to the whole CAN bus, `ventilation_control_mode` also reflects mode changes made from the physical remote or the official app, not just changes made through this plugin.
