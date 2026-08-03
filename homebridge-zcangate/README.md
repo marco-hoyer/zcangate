@@ -6,16 +6,44 @@ the Home app and Siri.
 
 ## Installation
 
-From this directory:
+Once published to npm (see [Publishing](#publishing) below), install it like
+any other Homebridge plugin — either via Homebridge UI X's plugin search, or:
 
 ```sh
-npm install
-npm run build
+npm install -g homebridge-zcangate
 ```
 
-Then either `npm link` it into your Homebridge installation, or copy the
-`homebridge-zcangate` directory (with its built `dist/`) into Homebridge's
-`node_modules`.
+### Installing from source (unpublished changes)
+
+This plugin lives in a subdirectory of the `zcangate` repo, so a plain
+`npm install github:marco-hoyer/zcangate` won't find its `package.json`.
+To run it from a local checkout instead:
+
+```sh
+cd homebridge-zcangate
+npm install
+npm run build
+npm link
+```
+
+Then in your Homebridge installation's directory: `npm link homebridge-zcangate`.
+
+## Publishing
+
+For maintainers cutting a new release:
+
+```sh
+cd homebridge-zcangate
+npm version patch   # or minor / major — also runs `npm run build` via prepublishOnly
+npm publish
+git push --follow-tags
+```
+
+`npm version` bumps the version in `package.json`, and `prepublishOnly`
+ensures `dist/` is rebuilt from the latest source before `npm publish` packs
+the tarball. The `files` field in `package.json` keeps the published package
+limited to `dist/`, `config.schema.json`, `README.md`, and `LICENSE` — no
+source, tests, or dev config ship to consumers.
 
 ## Configuration
 

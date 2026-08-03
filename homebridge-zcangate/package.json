@@ -3,12 +3,31 @@
   "version": "0.1.0",
   "description": "Homebridge plugin to control a Zehnder ComfoAir ventilation unit via the zcangate HTTP API",
   "main": "dist/index.js",
+  "license": "MIT",
+  "author": "Marco Hoyer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marco-hoyer/zcangate.git",
+    "directory": "homebridge-zcangate"
+  },
+  "bugs": {
+    "url": "https://github.com/marco-hoyer/zcangate/issues"
+  },
+  "homepage": "https://github.com/marco-hoyer/zcangate/tree/master/homebridge-zcangate#readme",
   "engines": {
     "node": ">=18.0.0",
     "homebridge": ">=1.6.0"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "zehnder",
+    "comfoair",
+    "ventilation",
+    "zcangate"
+  ],
+  "files": [
+    "dist",
+    "config.schema.json"
   ],
   "scripts": {
     "build": "tsc",
