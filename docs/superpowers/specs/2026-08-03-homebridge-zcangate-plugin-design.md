@@ -140,3 +140,26 @@ confirmed across two full toggle cycles in both directions.
 
 `TargetFanState` is therefore no longer purely a local optimistic cache;
 it converges to the device's real state on the next successful poll.
+
+## Addendum (2026-08-03): RotationSpeed changed from percentage to raw level
+
+A later revision briefly had `RotationSpeed` report the bucket-table
+percentages above (0/33/66/100) with `setProps({ minValue: 0, maxValue: 100,
+minStep: 100/3 })`. This caused a persistent loading spinner on the fan tile
+in the Home app: the declared step grid (`0, 33.33.., 66.67.., 100`) never
+exactly matched the rounded integer percentages the plugin actually pushed
+(`0, 33, 66, 100`), so HomeKit could never confirm the value was on-grid.
+
+The fix, following the pattern used by other multi-speed Homebridge fan
+plugins (e.g. `homebridge-tuya-lan`): `RotationSpeed` now reports the raw
+speed level directly — `setProps({ minValue: 0, maxValue: 3, minStep: 1 })` —
+and `getRotationSpeed`/`setRotationSpeed` operate on that 0–3 scale with no
+percentage conversion. HomeKit itself computes the displayed percentage from
+the characteristic's min/max range, so the Home app still shows 0%/33%/67%/
+100%, but every value the plugin pushes is a plain integer that trivially
+satisfies the integer step — eliminating the grid mismatch.
+
+`levelToPercent`/`percentToLevel` in `levelMapping.ts` were removed as a
+result (only `levelToCommand` remains); the "Bucket table" section above and
+the `RotationSpeed` rows in the HomeKit mapping table are superseded by this
+addendum.

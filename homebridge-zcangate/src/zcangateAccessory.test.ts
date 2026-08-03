@@ -150,11 +150,11 @@ describe('ZcangateAccessory', () => {
     expect(accessory.getServices()).toHaveLength(2);
   });
 
-  it('constrains RotationSpeed to snap at the 4 supported levels', () => {
+  it('constrains RotationSpeed to the 4 supported levels as raw integers', () => {
     expect(fanService.getCharacteristic(RotationSpeed).props).toEqual({
       minValue: 0,
-      maxValue: 100,
-      minStep: 100 / 3,
+      maxValue: 3,
+      minStep: 1,
     });
   });
 
@@ -172,7 +172,7 @@ describe('ZcangateAccessory', () => {
   });
 
   it('remembers the last non-zero level across an off/on cycle', async () => {
-    await fanService.getCharacteristic(RotationSpeed).triggerSet(66);
+    await fanService.getCharacteristic(RotationSpeed).triggerSet(2);
     await fanService.getCharacteristic(Active).triggerSet(0);
     client.runCommand.mockClear();
 
@@ -181,8 +181,8 @@ describe('ZcangateAccessory', () => {
     expect(client.runCommand).toHaveBeenCalledWith('ventilation_level_2');
   });
 
-  it('quantizes RotationSpeed to the nearest level', async () => {
-    await fanService.getCharacteristic(RotationSpeed).triggerSet(84);
+  it('rounds and clamps stray RotationSpeed values to a valid level', async () => {
+    await fanService.getCharacteristic(RotationSpeed).triggerSet(2.6);
 
     expect(client.runCommand).toHaveBeenCalledWith('ventilation_level_3');
   });
@@ -191,7 +191,7 @@ describe('ZcangateAccessory', () => {
     await fanService.getCharacteristic(TargetFanState).triggerSet(TargetFanState.AUTO);
     client.runCommand.mockClear();
 
-    await fanService.getCharacteristic(RotationSpeed).triggerSet(66);
+    await fanService.getCharacteristic(RotationSpeed).triggerSet(2);
 
     expect(client.runCommand).toHaveBeenNthCalledWith(1, 'manual_mode');
     expect(client.runCommand).toHaveBeenNthCalledWith(2, 'ventilation_level_2');
@@ -199,7 +199,7 @@ describe('ZcangateAccessory', () => {
   });
 
   it('does not resend manual_mode when already in manual mode', async () => {
-    await fanService.getCharacteristic(RotationSpeed).triggerSet(66);
+    await fanService.getCharacteristic(RotationSpeed).triggerSet(2);
 
     expect(client.runCommand).toHaveBeenCalledTimes(1);
     expect(client.runCommand).toHaveBeenCalledWith('ventilation_level_2');
@@ -232,7 +232,7 @@ describe('ZcangateAccessory', () => {
     await accessory.poll();
 
     expect(fanService.getCharacteristic(Active).value).toBe(1);
-    expect(fanService.getCharacteristic(RotationSpeed).value).toBe(100);
+    expect(fanService.getCharacteristic(RotationSpeed).value).toBe(3);
     expect(fanService.getCharacteristic(CurrentFanState).value).toBe(CurrentFanState.BLOWING_AIR);
   });
 
@@ -268,7 +268,7 @@ describe('ZcangateAccessory', () => {
 
     await accessory.poll();
 
-    expect(fanService.getCharacteristic(RotationSpeed).value).toBe(66);
+    expect(fanService.getCharacteristic(RotationSpeed).value).toBe(2);
   });
 
   it('throws a HapStatusError when a command fails', async () => {

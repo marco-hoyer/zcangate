@@ -1,6 +1,6 @@
 {
   "name": "homebridge-zcangate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Homebridge plugin to control a Zehnder ComfoAir ventilation unit via the zcangate HTTP API",
   "main": "dist/index.js",
   "license": "MIT",

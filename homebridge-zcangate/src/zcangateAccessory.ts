@@ -1,5 +1,5 @@
 import type { AccessoryConfig, AccessoryPlugin, API, CharacteristicValue, Logging, Service } from 'homebridge';
-import { levelToCommand, levelToPercent, percentToLevel } from './levelMapping';
+import { levelToCommand } from './levelMapping';
 import { ZcangateClient } from './zcangateClient';
 
 export interface ZcangateAccessoryConfig extends AccessoryConfig {
@@ -39,7 +39,7 @@ export class ZcangateAccessory implements AccessoryPlugin {
 
     this.fanService
       .getCharacteristic(this.api.hap.Characteristic.RotationSpeed)
-      .setProps({ minValue: 0, maxValue: 100, minStep: 100 / 3 })
+      .setProps({ minValue: 0, maxValue: 3, minStep: 1 })
       .onGet(this.getRotationSpeed.bind(this))
       .onSet(this.setRotationSpeed.bind(this));
 
@@ -82,7 +82,7 @@ export class ZcangateAccessory implements AccessoryPlugin {
       this.lastNonZeroLevel = level;
     }
     this.fanService.updateCharacteristic(this.api.hap.Characteristic.Active, level > 0 ? 1 : 0);
-    this.fanService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, levelToPercent(level));
+    this.fanService.updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, level);
     this.fanService.updateCharacteristic(
       this.api.hap.Characteristic.CurrentFanState,
       level > 0 ? this.api.hap.Characteristic.CurrentFanState.BLOWING_AIR : this.api.hap.Characteristic.CurrentFanState.INACTIVE,
@@ -99,11 +99,11 @@ export class ZcangateAccessory implements AccessoryPlugin {
   }
 
   private async getRotationSpeed(): Promise<CharacteristicValue> {
-    return levelToPercent(this.cachedLevel);
+    return this.cachedLevel;
   }
 
   private async setRotationSpeed(value: CharacteristicValue): Promise<void> {
-    const level = percentToLevel(value as number);
+    const level = Math.min(3, Math.max(0, Math.round(value as number)));
     if (this.cachedTargetState === this.api.hap.Characteristic.TargetFanState.AUTO) {
       await this.runCommandSafely('manual_mode');
       this.cachedTargetState = this.api.hap.Characteristic.TargetFanState.MANUAL;
