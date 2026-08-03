@@ -1,0 +1,36 @@
+{
+  "pluginAlias": "ZcangateVentilation",
+  "pluginType": "accessory",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "Ventilation",
+        "required": true
+      },
+      "apiBaseUrl": {
+        "title": "zcangate API base URL",
+        "type": "string",
+        "default": "http://raspberrypi:8080",
+        "required": true,
+        "description": "Base URL of the zcangate HTTP server, e.g. http://raspberrypi:8080"
+      },
+      "authToken": {
+        "title": "Auth token",
+        "type": "string",
+        "required": false,
+        "description": "Bearer token to send when executing commands. Leave empty if COMMAND_AUTH_TOKEN is not set on the zcangate server."
+      },
+      "pollInterval": {
+        "title": "Poll interval (seconds)",
+        "type": "integer",
+        "default": 30,
+        "minimum": 5,
+        "required": false
+      }
+    }
+  }
+}
