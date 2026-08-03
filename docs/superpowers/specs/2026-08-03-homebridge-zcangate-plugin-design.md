@@ -119,5 +119,24 @@ the plugin's README.
 - Bypass control (Switch accessory).
 - Temperature/humidity sensor accessories.
 - Converting to a platform plugin if multiple accessories are added later.
-- Reconciling `TargetFanState` from the device if a reliable measurement
-  field is ever confirmed.
+
+## Addendum (2026-08-03): TargetFanState reconciliation resolved
+
+The "Known limitation" above has been resolved. A `DEBUG_CAN` capture from
+real hardware showed that CAN PDU 72 — previously undecoded in
+`can/mapping.go` (the mapping jumped from PDU 71 to PDU 81) — flips cleanly
+between `00` and `01` in lockstep with `auto_mode`/`manual_mode` commands,
+confirmed across two full toggle cycles in both directions.
+
+- `can/mapping.go` now decodes PDU 72 as `ventilation_control_mode`
+  (`0`=auto, `1`=manual), so it's included in `/measurements`.
+- `zcangateAccessory.poll()` reads this field and reconciles
+  `TargetFanState`, inverting polarity since HAP's `TargetFanState` is
+  `MANUAL=0`/`AUTO=1` — the opposite of the device's encoding.
+- Because zcangate passively listens to the whole CAN bus, this also
+  surfaces mode changes made via the physical remote or official app, not
+  just changes made through this plugin — a stronger result than the
+  original spec anticipated.
+
+`TargetFanState` is therefore no longer purely a local optimistic cache;
+it converges to the device's real state on the next successful poll.
