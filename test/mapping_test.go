@@ -48,10 +48,10 @@ func TestToPdo(t *testing.T) {
 }
 
 func TestFromPdo(t *testing.T) {
-	input := uint64(0x1)
+	input := uint64(277)
 	result := can.FromPdo(input, 1)
-	if result != 1654849 {
-		t.Errorf("00454041 should be transformed to 1654849 but was %d", result)
+	if result != 0x00454041 {
+		t.Errorf("277 should be transformed to 0x00454041 but was %#x", result)
 	}
 }
 
