@@ -72,7 +72,7 @@ Homebridge UI X, which reads `config.schema.json` to render a form):
 | HomeKit characteristic | Behavior |
 |---|---|
 | `Active` (on/off) | Off sends `ventilation_level_0`. On sends `ventilation_level_N` for the last remembered non-zero speed (default level 1). |
-| `RotationSpeed` | Reports the raw speed level (`0`–`3`, `minValue: 0, maxValue: 3, minStep: 1`) — HomeKit itself computes the 0%/33%/67%/100% display from that range. Values are rounded/clamped to a valid level and mapped to `ventilation_level_0`.._3`. Changing speed while in Auto mode first switches to Manual. |
+| `RotationSpeed` (0–100%) | Quantized to the nearest of 4 buckets — 0/33/66/100 — mapped to `ventilation_level_0`.._3`. Changing speed while in Auto mode first switches to Manual. The slider drags smoothly (no native HomeKit snap points — see the design spec's addenda for why) but settles on the nearest valid percentage immediately after release. |
 | `TargetFanState` (Auto/Manual) | Sends the `auto_mode` / `manual_mode` commands. Reconciled from the polled `ventilation_control_mode` measurement (`0`=auto, `1`=manual — the inverse of HAP's `TargetFanState`). |
 | `CurrentFanState` (read-only) | Derived from the polled fan speed. |
 

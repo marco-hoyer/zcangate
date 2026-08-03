@@ -119,6 +119,9 @@ the plugin's README.
 - Bypass control (Switch accessory).
 - Temperature/humidity sensor accessories.
 - Converting to a platform plugin if multiple accessories are added later.
+- Native HomeKit mid-drag slider snapping for `RotationSpeed` (see the final
+  addendum below — two attempts both regressed, considered not reliably
+  achievable in the current Home app).
 
 ## Addendum (2026-08-03): TargetFanState reconciliation resolved
 
@@ -163,3 +166,27 @@ satisfies the integer step — eliminating the grid mismatch.
 result (only `levelToCommand` remains); the "Bucket table" section above and
 the `RotationSpeed` rows in the HomeKit mapping table are superseded by this
 addendum.
+
+## Addendum (2026-08-03): raw-level RotationSpeed reverted — HomeKit range wasn't rescaled
+
+The previous addendum's fix did not work in practice. Live testing showed the
+Home app slider still displayed a 0–100% range and snapped to 0%/1% —
+confirming that the Home app does **not** rescale `RotationSpeed`'s displayed
+percentage based on a custom `maxValue`; it always treats the raw value as a
+literal percentage. The `homebridge-tuya-lan` reference this fix was based on
+came from an AI-summarized description of that plugin's PR, not a verified
+read of its actual behavior, and turned out not to generalize here. Restarting
+the Home app and fully removing/re-adding the accessory (ruling out client-side
+metadata caching) did not change the result either.
+
+`RotationSpeed` has been reverted to the original percentage-based design
+(0–100%, `levelToPercent`/`percentToLevel` restored, no `setProps` override
+at all). Between this and the prior addendum's fractional-`minStep` spinner
+bug, two independent attempts at a native HomeKit "hard snap" for this
+characteristic both produced worse regressions than the plain percentage
+approach. Native mid-drag snapping via declared characteristic properties is
+therefore considered **not reliably achievable** for this characteristic in
+the current Home app, and is out of scope going forward (see "Out of scope /
+future work"). The slider drags smoothly; quantization still happens
+server-side in `setRotationSpeed`, so the value settles on the nearest valid
+percentage immediately after release.
