@@ -95,6 +95,11 @@ var mapping = map[int]Type{
 		unit:           "",
 		transformation: transformSmallNumber,
 	},
+	72: {
+		name:           "ventilation_control_mode",
+		unit:           "0=auto,1=manual",
+		transformation: transformSmallNumber,
+	},
 	81: {
 		name:           "fan_next_change",
 		unit:           "s",

@@ -54,3 +54,20 @@ func TestFromPdo(t *testing.T) {
 		t.Errorf("00454041 should be transformed to 1654849 but was %d", result)
 	}
 }
+
+func TestToMeasurementDecodesVentilationControlMode(t *testing.T) {
+	autoFrame := can.BusFrame{Pdu: 72, Data: "00"}
+	autoResult := can.ToMeasurement(autoFrame)
+	if autoResult.Name != "ventilation_control_mode" {
+		t.Errorf("expected name 'ventilation_control_mode', got '%s'", autoResult.Name)
+	}
+	if autoResult.Value != 0.0 {
+		t.Errorf("expected value 0.0 for auto mode, got %.2f", autoResult.Value)
+	}
+
+	manualFrame := can.BusFrame{Pdu: 72, Data: "01"}
+	manualResult := can.ToMeasurement(manualFrame)
+	if manualResult.Value != 1.0 {
+		t.Errorf("expected value 1.0 for manual mode, got %.2f", manualResult.Value)
+	}
+}
